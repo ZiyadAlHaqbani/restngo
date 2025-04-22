@@ -138,15 +138,17 @@ func matchMaps(a map[string]interface{}, b map[string]interface{}) (bool, string
 func (match *Match_Constraint) Constrain(node models.Node) models.MatchStatus {
 	resp := node.GetResp()
 
-	var obj map[string]interface{}
+	var obj map[string]interface{} = resp.Body
 	for _, key := range match.Field[:len(match.Field)-1] {
+
 		var valid bool
-		obj, valid = resp.Body[key].(map[string]interface{})
+		obj, valid = obj[key].(map[string]interface{})
+
 		if !valid {
 			return models.MatchStatus{
 				Success:        false,
 				Message:        fmt.Sprintf("object: %+v doesn't include field: %s", obj, key),
-				Failed_at_node: &node,
+				Failed_at_node: node,
 			}
 		}
 	}
@@ -160,15 +162,15 @@ func (match *Match_Constraint) Constrain(node models.Node) models.MatchStatus {
 		if !valid {
 			return models.MatchStatus{
 				Success:        false,
-				Message:        fmt.Sprintf("field: %s doesn't match expected type: %s", key, match.Type),
-				Failed_at_node: &node,
+				Message:        fmt.Sprintf("field: %s  of type: '%T' doesn't match expected type: %s", key, actual, match.Type),
+				Failed_at_node: node,
 			}
 		}
 		if value != actual_value {
 			return models.MatchStatus{
 				Success:        false,
-				Message:        fmt.Sprintf("field: %s doesn't match expected value: %s", key, value),
-				Failed_at_node: &node,
+				Message:        fmt.Sprintf("field: '%s' with value: '%s', doesn't match expected value: '%s'", key, actual_value, value),
+				Failed_at_node: node,
 			}
 		}
 	case TypeFloat:
@@ -177,15 +179,15 @@ func (match *Match_Constraint) Constrain(node models.Node) models.MatchStatus {
 		if !valid {
 			return models.MatchStatus{
 				Success:        false,
-				Message:        fmt.Sprintf("field: %s doesn't match expected type: %s", key, match.Type),
-				Failed_at_node: &node,
+				Message:        fmt.Sprintf("field: %s  of type: '%T' doesn't match expected type: %s", key, actual, match.Type),
+				Failed_at_node: node,
 			}
 		}
 		if value != actual_value {
 			return models.MatchStatus{
 				Success:        false,
-				Message:        fmt.Sprintf("field: %s doesn't match expected value: %f", key, value),
-				Failed_at_node: &node,
+				Message:        fmt.Sprintf("field: '%s' with value: '%f', doesn't match expected value: '%f'", key, actual_value, value),
+				Failed_at_node: node,
 			}
 		}
 	case TypeBool:
@@ -194,15 +196,15 @@ func (match *Match_Constraint) Constrain(node models.Node) models.MatchStatus {
 		if !valid {
 			return models.MatchStatus{
 				Success:        false,
-				Message:        fmt.Sprintf("field: %s doesn't match expected type: %s", key, match.Type),
-				Failed_at_node: &node,
+				Message:        fmt.Sprintf("field: %s  of type: '%T' doesn't match expected type: %s", key, actual, match.Type),
+				Failed_at_node: node,
 			}
 		}
 		if value != actual_value {
 			return models.MatchStatus{
 				Success:        false,
-				Message:        fmt.Sprintf("field: %s doesn't match expected value: %b", key, value),
-				Failed_at_node: &node,
+				Message:        fmt.Sprintf("field: '%s' with value: '%b', doesn't match expected value: '%b'", key, actual_value, value),
+				Failed_at_node: node,
 			}
 		}
 	case TypeArray:
@@ -212,7 +214,7 @@ func (match *Match_Constraint) Constrain(node models.Node) models.MatchStatus {
 			return models.MatchStatus{
 				Success:        false,
 				Message:        fmt.Sprintf("field: %s doesn't match expected type: %s", key, match.Type),
-				Failed_at_node: &node,
+				Failed_at_node: node,
 			}
 		}
 		valid, msg := matchLists(actual_value, value)
@@ -220,7 +222,7 @@ func (match *Match_Constraint) Constrain(node models.Node) models.MatchStatus {
 			return models.MatchStatus{
 				Success:        false,
 				Message:        msg,
-				Failed_at_node: &node,
+				Failed_at_node: node,
 			}
 		}
 	case TypeObject:
@@ -230,7 +232,7 @@ func (match *Match_Constraint) Constrain(node models.Node) models.MatchStatus {
 			return models.MatchStatus{
 				Success:        false,
 				Message:        fmt.Sprintf("field: %s doesn't match expected type: %s", key, match.Type),
-				Failed_at_node: &node,
+				Failed_at_node: node,
 			}
 		}
 		valid, msg := matchMaps(actual_value, value)
@@ -238,7 +240,7 @@ func (match *Match_Constraint) Constrain(node models.Node) models.MatchStatus {
 			return models.MatchStatus{
 				Success:        false,
 				Message:        msg,
-				Failed_at_node: &node,
+				Failed_at_node: node,
 			}
 		}
 
@@ -246,6 +248,6 @@ func (match *Match_Constraint) Constrain(node models.Node) models.MatchStatus {
 	return models.MatchStatus{
 		// Message:        fmt.Sprintf("matched field: %v with value: %s", match.Field, match.Type),
 		Success:        true,
-		Failed_at_node: &node,
+		Failed_at_node: node,
 	}
 }

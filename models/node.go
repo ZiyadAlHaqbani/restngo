@@ -18,4 +18,6 @@ type Node interface {
 	AddConstraint(Constraint)
 	AddNode(Node)
 	GetNextNodes() []Node
+	ToString() string
+	Successful() bool
 }

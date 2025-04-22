@@ -53,3 +53,15 @@ func (node *Get_Node) AddNode(new models.Node) {
 func (node *Get_Node) GetNextNodes() []models.Node {
 	return node.Next
 }
+
+func (node *Get_Node) ToString() string {
+	temp := node.match_status.ToString()
+	// resp := node.GetResp()
+	// temp = fmt.Sprintf("%s\n%s", temp, resp.ToString())
+
+	return temp
+}
+
+func (node *Get_Node) Successful() bool {
+	return node.match_status.Success
+}

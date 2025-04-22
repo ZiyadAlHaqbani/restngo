@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -68,15 +69,15 @@ func (resp *HTTPResponse) resolveInterfaceMap(temp string, key string, Map map[s
 
 func (resp *HTTPResponse) ToString() string {
 	temp := ""
-	temp = fmt.Sprintf("{%s\n\tStatus: %d", temp, resp.Status)
+	temp = fmt.Sprintf("%s\n\tStatus: %d", temp, resp.Status)
 
-	temp = fmt.Sprintf("%s\n{", temp)
+	temp = fmt.Sprintf("%s\n", temp)
 	for key, value := range resp.Headers {
 		temp = fmt.Sprintf("%s\n\t%s: %v", temp, key, value)
 	}
-	temp = fmt.Sprintf("%s\n}", temp)
+	temp = fmt.Sprintf("%s\n", temp)
 
-	temp = fmt.Sprintf("%s\n{", temp)
+	temp = fmt.Sprintf("%s\n", temp)
 	for key, value := range resp.Body {
 		switch v := value.(type) {
 		case string:
@@ -93,7 +94,7 @@ func (resp *HTTPResponse) ToString() string {
 			temp = fmt.Sprintf("%s\n\t%s: unknown type", temp, key)
 		}
 	}
-	temp = fmt.Sprintf("%s\n}", temp)
+	temp = fmt.Sprintf("%s\n", temp)
 
 	return temp
 }
@@ -110,6 +111,7 @@ func Handle(client *http.Client, request Request) (*HTTPResponse, error) {
 	for range request.Retries + 1 {
 		resp, err = client.Do(req)
 		if err == nil {
+			log.Printf("request: %s worked", request.Url)
 			break
 		}
 	}
