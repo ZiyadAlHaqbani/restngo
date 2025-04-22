@@ -2,30 +2,31 @@ package main
 
 import (
 	"fmt"
+	test_builder "htestp/builder"
+	"htestp/constraints"
 	httphandler "htestp/http_handler"
-	"htestp/nodes"
-	"net/http"
 )
 
 func main() {
 
 	fmt.Printf("start!\n")
 
-	var client *http.Client = http.DefaultClient
+	builder := test_builder.CreateNewBuilder()
 
-	var node = nodes.Get_Node{
-		Next: nil,
-		Request: httphandler.Request{
-			Url:    "https://httpbin.org/bearer",
-			Method: "GET",
-		},
-		Constraints: nil,
-	}
-	resp, err := node.Execute(client)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("Response: %+s", resp.ToString())
+	builder.AddGetNode(httphandler.Request{
+		Url:     "https://httpbin.com/json",
+		Method:  "GET",
+		Retries: 5,
+	}).
+		AddConstraint(&constraints.Match_Constraint{
+			Field:    []string{"slideshow", "author"},
+			Type:     constraints.TypeString,
+			Expected: "Yours Truly",
+		}).AddConstraint(&constraints.Match_Constraint{
+		Field:    []string{"slideshow", "me"},
+		Type:     constraints.TypeString,
+		Expected: "Yours Truly",
+	}).Run()
+
 	fmt.Printf("end!\n")
-
 }

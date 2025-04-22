@@ -7,10 +7,11 @@ import (
 )
 
 type Get_Node struct {
-	Next        models.Node
-	Request     httphandler.Request
-	Response    httphandler.HTTPResponse
-	Constraints []models.Constraint
+	Next         []models.Node
+	Request      httphandler.Request
+	Response     httphandler.HTTPResponse
+	Constraints  []models.Constraint
+	match_status models.MatchStatus
 }
 
 func (node *Get_Node) Execute(client *http.Client) (httphandler.HTTPResponse, error) {
@@ -24,24 +25,31 @@ func (node *Get_Node) Execute(client *http.Client) (httphandler.HTTPResponse, er
 
 // TODO: save the first failed constraint inside the node
 func (node *Get_Node) Check() bool {
+	var status models.MatchStatus
 	for _, constraint := range node.Constraints {
-		if !constraint.Constrain(node).Success {
+		status = constraint.Constrain(node)
+		if !status.Success {
+			node.match_status = status
 			return false
 		}
 	}
+	node.match_status = status
 	return true
 
 }
 
-// Execute() map[string]interface{}
-// Check() bool
 func (node *Get_Node) GetResp() httphandler.HTTPResponse {
 	return node.Response
 }
 
-type Post_Node struct {
-	next        models.Node
-	request     httphandler.Request
-	response    httphandler.HTTPResponse
-	constraints models.Constraint
+func (node *Get_Node) AddConstraint(constraint models.Constraint) {
+	node.Constraints = append(node.Constraints, constraint)
+}
+
+func (node *Get_Node) AddNode(new models.Node) {
+	node.Next = append(node.Next, new)
+}
+
+func (node *Get_Node) GetNextNodes() []models.Node {
+	return node.Next
 }

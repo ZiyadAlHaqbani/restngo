@@ -6,12 +6,16 @@ import (
 )
 
 type Node interface {
-	//	url httphandler.Request
-	//	response map[string]interface{}
-	//	constraints Constraint[]
-	//	next Node
+	// Next         []models.Node
+	// Request      httphandler.Request
+	// Response     httphandler.HTTPResponse
+	// Constraints  []models.Constraint
+	// match_status models.MatchStatus
 
 	Execute(client *http.Client) (httphandler.HTTPResponse, error)
 	Check() bool
 	GetResp() httphandler.HTTPResponse
+	AddConstraint(Constraint)
+	AddNode(Node)
+	GetNextNodes() []Node
 }
