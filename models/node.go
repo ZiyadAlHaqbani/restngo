@@ -11,7 +11,7 @@ type Node interface {
 	//	constraints Constraint[]
 	//	next Node
 
-	Execute(client *http.Client) map[string]interface{}
+	Execute(client *http.Client) (httphandler.HTTPResponse, error)
 	Check() bool
 	GetResp() httphandler.HTTPResponse
 }

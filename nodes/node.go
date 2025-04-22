@@ -18,19 +18,26 @@ func (node *Get_Node) Execute(client *http.Client) (httphandler.HTTPResponse, er
 	if err != nil {
 		return httphandler.HTTPResponse{}, err
 	}
-
+	node.Response = *resp
 	return *resp, nil
 }
 
+// TODO: save the first failed constraint inside the node
 func (node *Get_Node) Check() bool {
 	for _, constraint := range node.Constraints {
-		constraint.Constrain(node)
+		if !constraint.Constrain(node).Success {
+			return false
+		}
 	}
+	return true
+
 }
 
 // Execute() map[string]interface{}
 // Check() bool
-// GetResp() httphandler.HTTPResponse
+func (node *Get_Node) GetResp() httphandler.HTTPResponse {
+	return node.Response
+}
 
 type Post_Node struct {
 	next        models.Node
