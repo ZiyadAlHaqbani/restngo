@@ -1,8 +1,8 @@
 package models
 
-//	constrain nodes, where at the end of each step, the response must satisfy all related constraints
+// constrain nodes, where at the end of each step, the response must satisfy all related constraints
 type Constraint interface {
-	Constrain(node *Node) MatchStatus
+	Constrain(node Node) MatchStatus
 }
 
 type MatchStatus struct {

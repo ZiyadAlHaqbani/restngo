@@ -150,9 +150,7 @@ func (match *Match_Constraint) Constrain(node models.Node) models.MatchStatus {
 			}
 		}
 	}
-
 	key := match.Field[len(match.Field)-1]
-
 	actual := obj[key]
 
 	switch match.Type {
