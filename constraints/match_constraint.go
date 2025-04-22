@@ -3,7 +3,6 @@ package constraints
 import (
 	"fmt"
 	"htestp/models"
-	"strconv"
 )
 
 type MatchType string
@@ -23,30 +22,117 @@ type Match_Constraint struct {
 }
 
 func matchLists(a []interface{}, b []interface{}) (bool, string) {
-	
-	if len(a) != len(b){
-		return false
+
+	if len(a) != len(b) {
+		return false, fmt.Sprintf("expected list of length: %d but found list of length: %d", len(b), len(a))
 	}
 
 	for i, value := range a {
 		switch v := value.(type) {
 		case string:
 			expected, valid := b[i].(string)
-			if !valid
+			if !valid {
+				return false, fmt.Sprintf("type mismatch")
+			}
+			if expected != v {
+				return false, fmt.Sprintf("expected value: %s but found: %s", expected, v)
+			}
 		case float64:
-			temp = fmt.Sprintf("%s\n%s%d: %f", temp, tabs(depth), key, v)
+			expected, valid := b[i].(float64)
+			if !valid {
+				return false, fmt.Sprintf("type mismatch")
+			}
+			if expected != v {
+				return false, fmt.Sprintf("expected value: %s but found: %s", expected, v)
+			}
 		case bool:
-			temp = fmt.Sprintf("%s\n%s%d: %b", temp, tabs(depth), key, v)
+			expected, valid := b[i].(bool)
+			if !valid {
+				return false, fmt.Sprintf("type mismatch")
+			}
+			if expected != v {
+				return false, fmt.Sprintf("expected value: %s but found: %s", expected, v)
+			}
 		case []interface{}:
-			temp = resp.resolveInterfaceList(temp, strconv.Itoa(key), v, depth+1)
+			expected, valid := b[i].([]interface{})
+			if !valid {
+				return false, fmt.Sprintf("type mismatch")
+			}
+			valid, msg := matchLists(v, expected)
+			if !valid {
+				return false, msg
+			}
 		case map[string]interface{}:
-			temp = resp.resolveInterfaceMap(temp, strconv.Itoa(key), v, depth+1)
+			expected, valid := b[i].(map[string]interface{})
+			if !valid {
+				return false, fmt.Sprintf("type mismatch")
+			}
+			valid, msg := matchMaps(v, expected)
+			if !valid {
+				return false, msg
+			}
 		default:
-			temp = fmt.Sprintf("%s\n%s%d: unknown type", tabs(depth), temp, key)
+			return false, "unexpected type found!!!"
 		}
 	}
 
-	return true
+	return true, ""
+}
+func matchMaps(a map[string]interface{}, b map[string]interface{}) (bool, string) {
+	if len(a) != len(b) {
+		return false, fmt.Sprintf("expected list of length: %d but found list of length: %d", len(b), len(a))
+	}
+
+	for key, value := range a {
+		switch v := value.(type) {
+		case string:
+			expected, valid := b[key].(string)
+			if !valid {
+				return false, fmt.Sprintf("type mismatch")
+			}
+			if expected != v {
+				return false, fmt.Sprintf("expected value: %s but found: %s", expected, v)
+			}
+		case float64:
+			expected, valid := b[key].(float64)
+			if !valid {
+				return false, fmt.Sprintf("type mismatch")
+			}
+			if expected != v {
+				return false, fmt.Sprintf("expected value: %s but found: %s", expected, v)
+			}
+		case bool:
+			expected, valid := b[key].(bool)
+			if !valid {
+				return false, fmt.Sprintf("type mismatch")
+			}
+			if expected != v {
+				return false, fmt.Sprintf("expected value: %s but found: %s", expected, v)
+			}
+		case []interface{}:
+			expected, valid := b[key].([]interface{})
+			if !valid {
+				return false, fmt.Sprintf("type mismatch")
+			}
+			valid, msg := matchLists(v, expected)
+			if !valid {
+				return false, msg
+			}
+		case map[string]interface{}:
+			expected, valid := b[key].(map[string]interface{})
+			if !valid {
+				return false, fmt.Sprintf("type mismatch")
+			}
+			valid, msg := matchMaps(v, expected)
+			if !valid {
+				return false, msg
+			}
+		default:
+			return false, "unexpected type found!!!"
+		}
+	}
+
+	return true, ""
 }
 
 func (match *Match_Constraint) Constrain(node models.Node) models.MatchStatus {
@@ -131,10 +217,29 @@ func (match *Match_Constraint) Constrain(node models.Node) models.MatchStatus {
 				Failed_at_node: &node,
 			}
 		}
-		if matchLists(actual_value, value) {
+		valid, msg := matchLists(actual_value, value)
+		if !valid {
 			return models.MatchStatus{
 				Success:        false,
-				Message:        fmt.Sprintf("field: %s doesn't match expected value: %f", key, value),
+				Message:        msg,
+				Failed_at_node: &node,
+			}
+		}
+	case TypeObject:
+		value := match.Expected.(map[string]interface{})
+		actual_value, valid := actual.(map[string]interface{})
+		if !valid {
+			return models.MatchStatus{
+				Success:        false,
+				Message:        fmt.Sprintf("field: %s doesn't match expected type: %s", key, match.Type),
+				Failed_at_node: &node,
+			}
+		}
+		valid, msg := matchMaps(actual_value, value)
+		if !valid {
+			return models.MatchStatus{
+				Success:        false,
+				Message:        msg,
 				Failed_at_node: &node,
 			}
 		}
