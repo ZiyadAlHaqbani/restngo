@@ -2,9 +2,11 @@ package test_builder
 
 import (
 	"fmt"
+	"htestp/constraints"
 	httphandler "htestp/http_handler"
 	"htestp/models"
 	"htestp/nodes"
+	"log"
 	"net/http"
 )
 
@@ -20,6 +22,7 @@ func CreateNewBuilder() *TestBuilder {
 		head:    nil,
 		current: nil,
 		client:  http.DefaultClient,
+		Storage: map[string]models.TypedVariable{},
 	}
 
 	return builder
@@ -29,8 +32,11 @@ type TestBuilder struct {
 	head    models.Node
 	current models.Node
 	client  *http.Client
+	Storage map[string]models.TypedVariable
 }
 
+// TODO: change to take url and method
+// TODO: add AddStaticNodeRaw
 func (builder *TestBuilder) AddStaticNode(request httphandler.Request) *TestBuilder {
 
 	new := &nodes.StaticNode{Request: request}
@@ -46,26 +52,50 @@ func (builder *TestBuilder) AddStaticNode(request httphandler.Request) *TestBuil
 	return builder
 }
 
-func (builder *TestBuilder) AddDynamicNode(url string, method HTTPMethod) *TestBuilder {
+// TODO: add AddDynamicNodeRaw
+func (builder *TestBuilder) AddDynamicNode(url string, method HTTPMethod, queryBuilder func(*map[string]models.TypedVariable) map[string]string, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
 
 	new := &nodes.DynamicNode{
 		InnerNode: nodes.StaticNode{Request: httphandler.Request{
 			Url:    url,
 			Method: string(method),
 		}},
-		QueryBuilderFunc: func(storage map[string]models.TypedVariable) map[string]string {
-			panic("TODO")
-		},
+		QueryBuilderFunc: queryBuilder,
+		BodyBuilderFunc:  bodyBuilder,
 	}
 
+	if builder.head == nil {
+		builder.head = new
+		builder.current = builder.head
+		return builder
+	}
 	builder.current.AddNode(new)
 	builder.current = new
 
 	return builder
 }
 
-func (builder *TestBuilder) AddConstraint(constraint models.Constraint) *TestBuilder {
-	builder.current.AddConstraint(constraint)
+func (builder *TestBuilder) AddMatchConstraint(fields []string, expectedValue interface{}, expectedType models.MatchType) *TestBuilder {
+	constraint := constraints.Match_Constraint{
+		Field:    fields,
+		Type:     expectedType,
+		Expected: expectedValue,
+	}
+	builder.current.AddConstraint(&constraint)
+	return builder
+}
+
+func (builder *TestBuilder) AddMatchStoreConstraint(fields []string, expectedValue interface{}, expectedType models.MatchType, varname string) *TestBuilder {
+	constraint := constraints.Match_Store_Constraint{
+		InnerConstraint: constraints.Match_Constraint{
+			Field:    fields,
+			Type:     expectedType,
+			Expected: expectedValue,
+		},
+		Storage: &builder.Storage,
+		Varname: varname,
+	}
+	builder.current.AddConstraint(&constraint)
 	return builder
 }
 
@@ -87,21 +117,9 @@ func (builder *TestBuilder) printListHelper(node models.Node) {
 }
 
 func (builder *TestBuilder) Run() bool {
-
 	node := builder.head
+	return builder.runHelper(node)
 
-	node.Execute(builder.client)
-	if !node.Check() {
-		return false
-	}
-
-	for _, nextNode := range node.GetNextNodes() {
-		if !builder.runHelper(nextNode) {
-			return false
-		}
-	}
-
-	return true
 }
 func (builder *TestBuilder) runHelper(node models.Node) bool {
 
@@ -109,7 +127,11 @@ func (builder *TestBuilder) runHelper(node models.Node) bool {
 		return true
 	}
 
-	node.Execute(builder.client)
+	_, err := node.Execute(builder.client)
+	if err != nil {
+		log.Print(err)
+		return false
+	}
 	if !node.Check() {
 		return false
 	}

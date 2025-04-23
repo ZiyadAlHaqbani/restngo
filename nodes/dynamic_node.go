@@ -10,10 +10,12 @@ import (
 )
 
 type DynamicNode struct {
-	InnerNode        StaticNode
-	QueryBuilderFunc func(storage map[string]models.TypedVariable) map[string]string
-	BodyBuilderFunc  func(storage map[string]models.TypedVariable) map[string]interface{}
-	storage          map[string]models.TypedVariable
+	InnerNode StaticNode
+	// TODO: Use url values instead of map[string]string
+	QueryBuilderFunc func(storage *map[string]models.TypedVariable) map[string]string
+	BodyBuilderFunc  func(storage *map[string]models.TypedVariable) map[string]interface{}
+	storage          *map[string]models.TypedVariable
+	Next             models.Node
 }
 
 // Execute(client *http.Client) (httphandler.HTTPResponse, error)
@@ -26,7 +28,6 @@ type DynamicNode struct {
 // Successful() bool
 
 func (node *DynamicNode) Execute(client *http.Client) (httphandler.HTTPResponse, error) {
-
 	request_params := ""
 
 	var request_body *bytes.Buffer
@@ -77,7 +78,7 @@ func (node *DynamicNode) GetNextNodes() []models.Node {
 }
 
 func (node *DynamicNode) AddNode(new models.Node) {
-	node.InnerNode.AddNode(new)
+	node.Next = new
 }
 
 func (node *DynamicNode) ToString() string {
