@@ -8,13 +8,13 @@ type Constraint interface {
 }
 
 type MatchStatus struct {
-	Success        bool
+	Failed         bool
 	Message        string
-	Failed_at_node Node
+	Failed_at_node *Node
 }
 
 func (match *MatchStatus) ToString() string {
-	if match.Success {
+	if !match.Failed {
 		return match.Message
 	}
 	temp := ""

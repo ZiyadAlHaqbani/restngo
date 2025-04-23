@@ -10,13 +10,6 @@ import (
 	"net/http"
 )
 
-type HTTPMethod string
-
-const (
-	GET  HTTPMethod = "GET"
-	POST HTTPMethod = "POST"
-)
-
 func CreateNewBuilder() *TestBuilder {
 	builder := &TestBuilder{
 		head:    nil,
@@ -53,7 +46,7 @@ func (builder *TestBuilder) AddStaticNode(request httphandler.Request) *TestBuil
 }
 
 // TODO: add AddDynamicNodeRaw
-func (builder *TestBuilder) AddDynamicNode(url string, method HTTPMethod, queryBuilder func(*map[string]models.TypedVariable) map[string]string, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
+func (builder *TestBuilder) AddDynamicNode(url string, method models.HTTPMethod, queryBuilder func(*map[string]models.TypedVariable) map[string]string, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
 
 	new := &nodes.DynamicNode{
 		InnerNode: nodes.StaticNode{Request: httphandler.Request{
@@ -62,6 +55,7 @@ func (builder *TestBuilder) AddDynamicNode(url string, method HTTPMethod, queryB
 		}},
 		QueryBuilderFunc: queryBuilder,
 		BodyBuilderFunc:  bodyBuilder,
+		Storage:          &builder.Storage,
 	}
 
 	if builder.head == nil {

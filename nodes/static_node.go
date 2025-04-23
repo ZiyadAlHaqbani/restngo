@@ -29,7 +29,7 @@ func (node *StaticNode) Check() bool {
 	var status models.MatchStatus
 	for _, constraint := range node.Constraints {
 		status = constraint.Constrain(node)
-		if !status.Success {
+		if status.Failed {
 			node.match_status = status
 			return false
 		}
@@ -65,5 +65,5 @@ func (node *StaticNode) ToString() string {
 }
 
 func (node *StaticNode) Successful() bool {
-	return node.match_status.Success
+	return !node.match_status.Failed
 }

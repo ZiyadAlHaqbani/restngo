@@ -7,6 +7,7 @@ import (
 	httphandler "htestp/http_handler"
 	"htestp/models"
 	"net/http"
+	"net/url"
 )
 
 type DynamicNode struct {
@@ -14,7 +15,7 @@ type DynamicNode struct {
 	// TODO: Use url values instead of map[string]string
 	QueryBuilderFunc func(storage *map[string]models.TypedVariable) map[string]string
 	BodyBuilderFunc  func(storage *map[string]models.TypedVariable) map[string]interface{}
-	storage          *map[string]models.TypedVariable
+	Storage          *map[string]models.TypedVariable
 	Next             models.Node
 }
 
@@ -27,36 +28,35 @@ type DynamicNode struct {
 // ToString() string
 // Successful() bool
 
-func (node *DynamicNode) Execute(client *http.Client) (httphandler.HTTPResponse, error) {
-	request_params := ""
+func sanitizeQuery(query map[string]string) string {
+	//	e.g value = "My name is Ahmad" can't be included in url queries.
+	//	"My name is Ahmad" -> "My+name+is+Ahmad" can be included in url queries.
+	params := url.Values{}
+	for key, value := range query {
+		params.Add(key, value)
+	}
+	return params.Encode()
+}
 
-	var request_body *bytes.Buffer
+func (node *DynamicNode) Execute(client *http.Client) (httphandler.HTTPResponse, error) {
 
 	if node.QueryBuilderFunc != nil {
-		firstParam := true
-		params := node.QueryBuilderFunc(node.storage)
-		for key, value := range params {
-			if firstParam {
-				firstParam = false
-				request_params = fmt.Sprintf("%s?%s=%s", request_params, key, value)
-			}
-			request_params = fmt.Sprintf("%s&%s=%s", request_params, key, value)
-		}
+
+		params := node.QueryBuilderFunc(node.Storage)
+		request_params := sanitizeQuery(params)
+		node.InnerNode.Request.Url += "?" + request_params
 	}
 
 	if node.BodyBuilderFunc != nil {
-		body := node.BodyBuilderFunc(node.storage)
+		body := node.BodyBuilderFunc(node.Storage)
 		byteArray, err := json.Marshal(body)
 		if err != nil {
 			return httphandler.HTTPResponse{}, fmt.Errorf("failed to encode the generated request body")
 		}
 
-		request_body = bytes.NewBuffer(byteArray)
-
+		request_body := bytes.NewBuffer(byteArray)
+		node.InnerNode.Request.Body = *request_body
 	}
-
-	node.InnerNode.Request.Body = *request_body
-	node.InnerNode.Request.Url += request_params
 
 	return node.InnerNode.Execute(client)
 }

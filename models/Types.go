@@ -9,3 +9,10 @@ const (
 	TypeObject MatchType = "map[string]interface{}"
 	TypeArray  MatchType = "[]interface{}"
 )
+
+type HTTPMethod string
+
+const (
+	GET  HTTPMethod = "GET"
+	POST HTTPMethod = "POST"
+)
