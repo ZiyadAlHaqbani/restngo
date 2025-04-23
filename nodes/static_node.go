@@ -1,12 +1,13 @@
 package nodes
 
 import (
+	"fmt"
 	httphandler "htestp/http_handler"
 	"htestp/models"
 	"net/http"
 )
 
-type Get_Node struct {
+type StaticNode struct {
 	Next         []models.Node
 	Request      httphandler.Request
 	Response     httphandler.HTTPResponse
@@ -14,7 +15,7 @@ type Get_Node struct {
 	match_status models.MatchStatus
 }
 
-func (node *Get_Node) Execute(client *http.Client) (httphandler.HTTPResponse, error) {
+func (node *StaticNode) Execute(client *http.Client) (httphandler.HTTPResponse, error) {
 	resp, err := httphandler.Handle(client, node.Request)
 	if err != nil {
 		return httphandler.HTTPResponse{}, err
@@ -24,7 +25,7 @@ func (node *Get_Node) Execute(client *http.Client) (httphandler.HTTPResponse, er
 }
 
 // TODO: save the first failed constraint inside the node
-func (node *Get_Node) Check() bool {
+func (node *StaticNode) Check() bool {
 	var status models.MatchStatus
 	for _, constraint := range node.Constraints {
 		status = constraint.Constrain(node)
@@ -38,30 +39,31 @@ func (node *Get_Node) Check() bool {
 
 }
 
-func (node *Get_Node) GetResp() httphandler.HTTPResponse {
+func (node *StaticNode) GetResp() httphandler.HTTPResponse {
 	return node.Response
 }
 
-func (node *Get_Node) AddConstraint(constraint models.Constraint) {
+func (node *StaticNode) AddConstraint(constraint models.Constraint) {
 	node.Constraints = append(node.Constraints, constraint)
 }
 
-func (node *Get_Node) AddNode(new models.Node) {
+func (node *StaticNode) AddNode(new models.Node) {
 	node.Next = append(node.Next, new)
 }
 
-func (node *Get_Node) GetNextNodes() []models.Node {
+func (node *StaticNode) GetNextNodes() []models.Node {
 	return node.Next
 }
 
-func (node *Get_Node) ToString() string {
-	temp := node.match_status.ToString()
+func (node *StaticNode) ToString() string {
+	temp := fmt.Sprintf("%s_%s", node.Request.Method, node.Request.Url)
+	temp = fmt.Sprintf("%s%s", temp, node.match_status.ToString())
 	// resp := node.GetResp()
 	// temp = fmt.Sprintf("%s\n%s", temp, resp.ToString())
 
 	return temp
 }
 
-func (node *Get_Node) Successful() bool {
+func (node *StaticNode) Successful() bool {
 	return node.match_status.Success
 }

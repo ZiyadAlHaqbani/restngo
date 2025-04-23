@@ -15,7 +15,7 @@ type MatchStatus struct {
 
 func (match *MatchStatus) ToString() string {
 	if match.Success {
-		return ""
+		return match.Message
 	}
 	temp := ""
 	temp = fmt.Sprintf("%sreason: %+v\n", temp, match.Message)

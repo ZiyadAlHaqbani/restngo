@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -111,7 +110,6 @@ func Handle(client *http.Client, request Request) (*HTTPResponse, error) {
 	for range request.Retries + 1 {
 		resp, err = client.Do(req)
 		if err == nil {
-			log.Printf("request: %s worked", request.Url)
 			break
 		}
 	}

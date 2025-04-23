@@ -8,6 +8,13 @@ import (
 	"net/http"
 )
 
+type HTTPMethod string
+
+const (
+	GET  HTTPMethod = "GET"
+	POST HTTPMethod = "POST"
+)
+
 func CreateNewBuilder() *TestBuilder {
 	builder := &TestBuilder{
 		head:    nil,
@@ -24,13 +31,31 @@ type TestBuilder struct {
 	client  *http.Client
 }
 
-func (builder *TestBuilder) AddGetNode(request httphandler.Request) *TestBuilder {
+func (builder *TestBuilder) AddStaticNode(request httphandler.Request) *TestBuilder {
 
-	new := &nodes.Get_Node{Request: request}
+	new := &nodes.StaticNode{Request: request}
 	if builder.head == nil {
 		builder.head = new
 		builder.current = builder.head
 		return builder
+	}
+
+	builder.current.AddNode(new)
+	builder.current = new
+
+	return builder
+}
+
+func (builder *TestBuilder) AddDynamicNode(url string, method HTTPMethod) *TestBuilder {
+
+	new := &nodes.DynamicNode{
+		InnerNode: nodes.StaticNode{Request: httphandler.Request{
+			Url:    url,
+			Method: string(method),
+		}},
+		QueryBuilderFunc: func(storage map[string]models.TypedVariable) map[string]string {
+			panic("TODO")
+		},
 	}
 
 	builder.current.AddNode(new)

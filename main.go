@@ -5,6 +5,7 @@ import (
 	test_builder "htestp/builder"
 	"htestp/constraints"
 	httphandler "htestp/http_handler"
+	"htestp/models"
 )
 
 func main() {
@@ -13,19 +14,19 @@ func main() {
 
 	builder := test_builder.CreateNewBuilder()
 
-	builder.AddGetNode(httphandler.Request{
+	builder.AddStaticNode(httphandler.Request{
 		Url:    "https://httpbin.org/json",
 		Method: "GET",
 	}).AddConstraint(&constraints.Match_Constraint{
 		Field:    []string{"slideshow", "author"},
-		Type:     constraints.TypeString,
+		Type:     models.TypeString,
 		Expected: "Yours Truly",
-	}).AddGetNode(httphandler.Request{
+	}).AddStaticNode(httphandler.Request{
 		Url:    "https://pokeapi.co/api/v2/pokemon/ditto",
 		Method: "GET",
 	}).AddConstraint(&constraints.Match_Constraint{
 		Field:    []string{"height"},
-		Type:     constraints.TypeFloat,
+		Type:     models.TypeFloat,
 		Expected: 3.0,
 	})
 

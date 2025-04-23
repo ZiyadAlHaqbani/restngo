@@ -5,20 +5,10 @@ import (
 	"htestp/models"
 )
 
-type MatchType string
-
-const (
-	TypeString MatchType = "string"
-	TypeFloat  MatchType = "float64"
-	TypeBool   MatchType = "bool"
-	TypeObject MatchType = "map[string]interface{}"
-	TypeArray  MatchType = "[]interface{}"
-)
-
 type Match_Constraint struct {
-	Field    []string    //	e.g ["user", "age"] would access user.age
-	Type     MatchType   //	defines the type of the final field in the 'Field' array
-	Expected interface{} //	the expected value in the final field
+	Field    []string         //	e.g ["user", "age"] would access user.age
+	Type     models.MatchType //	defines the type of the final field in the 'Field' array
+	Expected interface{}      //	the expected value in the final field
 }
 
 func matchLists(a []interface{}, b []interface{}) (bool, string) {
@@ -156,7 +146,7 @@ func (match *Match_Constraint) Constrain(node models.Node) models.MatchStatus {
 	actual := obj[key]
 
 	switch match.Type {
-	case TypeString:
+	case models.TypeString:
 		value := match.Expected.(string)
 		actual_value, valid := actual.(string)
 		if !valid {
@@ -173,7 +163,7 @@ func (match *Match_Constraint) Constrain(node models.Node) models.MatchStatus {
 				Failed_at_node: node,
 			}
 		}
-	case TypeFloat:
+	case models.TypeFloat:
 		value := match.Expected.(float64)
 		actual_value, valid := actual.(float64)
 		if !valid {
@@ -190,7 +180,7 @@ func (match *Match_Constraint) Constrain(node models.Node) models.MatchStatus {
 				Failed_at_node: node,
 			}
 		}
-	case TypeBool:
+	case models.TypeBool:
 		value := match.Expected.(bool)
 		actual_value, valid := actual.(bool)
 		if !valid {
@@ -207,7 +197,7 @@ func (match *Match_Constraint) Constrain(node models.Node) models.MatchStatus {
 				Failed_at_node: node,
 			}
 		}
-	case TypeArray:
+	case models.TypeArray:
 		value := match.Expected.([]interface{})
 		actual_value, valid := actual.([]interface{})
 		if !valid {
@@ -225,7 +215,7 @@ func (match *Match_Constraint) Constrain(node models.Node) models.MatchStatus {
 				Failed_at_node: node,
 			}
 		}
-	case TypeObject:
+	case models.TypeObject:
 		value := match.Expected.(map[string]interface{})
 		actual_value, valid := actual.(map[string]interface{})
 		if !valid {
@@ -246,7 +236,7 @@ func (match *Match_Constraint) Constrain(node models.Node) models.MatchStatus {
 
 	}
 	return models.MatchStatus{
-		// Message:        fmt.Sprintf("matched field: %v with value: %s", match.Field, match.Type),
+		Message:        "all constraints satisfied!",
 		Success:        true,
 		Failed_at_node: node,
 	}
