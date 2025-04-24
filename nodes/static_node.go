@@ -57,7 +57,14 @@ func (node *StaticNode) GetNextNodes() []models.Node {
 
 func (node *StaticNode) ToString() string {
 	temp := fmt.Sprintf("%s_%s", node.Request.Method, node.Request.Url)
-	temp = fmt.Sprintf("%s %s", temp, node.match_status.ToString())
+
+	if len(node.Constraints) > 0 {
+		temp += " {"
+		for _, constr := range node.Constraints {
+			temp += constr.ToString() + ", "
+		}
+		temp += "}"
+	}
 	// resp := node.GetResp()
 	// temp = fmt.Sprintf("%s\n%s", temp, resp.ToString())
 

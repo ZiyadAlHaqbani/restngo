@@ -93,3 +93,7 @@ func (match *Exist_Constraint) constrain(node models.Node) models.MatchStatus {
 		ValueType:      match.Type,
 	}
 }
+
+func (match *Exist_Constraint) ToString() string {
+	return "exst_cnstr_" + match.Status.ToString()
+}

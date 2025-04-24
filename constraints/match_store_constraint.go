@@ -18,3 +18,7 @@ func (match *Match_Store_Constraint) Constrain(node models.Node) models.MatchSta
 	}
 	return status
 }
+
+func (match *Match_Store_Constraint) ToString() string {
+	return "str_" + match.InnerConstraint.ToString()
+}

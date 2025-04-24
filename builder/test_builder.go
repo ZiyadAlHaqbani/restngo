@@ -93,6 +93,29 @@ func (builder *TestBuilder) AddMatchStoreConstraint(fields []string, expectedVal
 	return builder
 }
 
+func (builder *TestBuilder) AddExistsConstraint(fields []string, expectedType models.MatchType) *TestBuilder {
+	constraint := constraints.Exist_Constraint{
+		Field: fields,
+		Type:  expectedType,
+	}
+	builder.current.AddConstraint(&constraint)
+	return builder
+}
+
+// func (builder *TestBuilder) AddMatchStoreConstraint(fields []string, expectedValue interface{}, expectedType models.MatchType, varname string) *TestBuilder {
+// 	constraint := constraints.Match_Store_Constraint{
+// 		InnerConstraint: constraints.Match_Constraint{
+// 			Field:    fields,
+// 			Type:     expectedType,
+// 			Expected: expectedValue,
+// 		},
+// 		Storage: &builder.Storage,
+// 		Varname: varname,
+// 	}
+// 	builder.current.AddConstraint(&constraint)
+// 	return builder
+// }
+
 func (builder *TestBuilder) PrintList() {
 	builder.printListHelper(builder.head)
 }

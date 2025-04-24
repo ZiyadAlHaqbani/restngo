@@ -7,6 +7,7 @@ import (
 // constrain nodes, where at the end of each step, the response must satisfy all related constraints
 type Constraint interface {
 	Constrain(node Node) MatchStatus
+	ToString() string
 }
 
 type MatchStatus struct {

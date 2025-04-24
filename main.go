@@ -23,23 +23,29 @@ func main() {
 	// 	panic("json ERROR")
 	// }
 
-	builder.AddStaticNode(httphandler.Request{
-		Url:    "http://httpbin.org/json",
-		Method: string(models.GET),
-		// Body:   *bytes.NewBuffer(req_bytes),
-	}).AddMatchStoreConstraint(
-		[]string{"slideshow", "author"},
-		"Yours Truly",
-		models.TypeString,
-		"authorName",
-	).AddDynamicNode("https://openlibrary.org/search.json", models.GET,
-		func(m *map[string]models.TypedVariable) map[string]string {
-			key := (*m)["authorName"]
-			Map := map[string]string{}
-			Map["q"] = key.Value.(string)
-			return Map
-		},
-		nil)
+	builder.
+		AddStaticNode(httphandler.Request{
+			Url:    "http://httpbin.org/json",
+			Method: string(models.GET),
+			// Body:   *bytes.NewBuffer(req_bytes),
+		}).
+		AddMatchStoreConstraint(
+			[]string{"slideshow", "author"},
+			"Yours Truly",
+			models.TypeString,
+			"authorName",
+		).
+		AddExistsConstraint(
+			[]string{"slideshow", "author"}, models.TypeString,
+		).
+		AddDynamicNode("https://openlibrary.org/search.json", models.GET,
+			func(m *map[string]models.TypedVariable) map[string]string {
+				key := (*m)["authorName"]
+				Map := map[string]string{}
+				Map["q"] = key.Value.(string)
+				return Map
+			},
+			nil)
 
 	if !builder.Run() {
 		fmt.Printf("FAILED!!!\n")

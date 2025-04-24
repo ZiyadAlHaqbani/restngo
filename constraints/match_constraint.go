@@ -136,3 +136,7 @@ func (match *Match_Constraint) constrain(node models.Node) models.MatchStatus {
 		ValueType:      match.Type,
 	}
 }
+
+func (match *Match_Constraint) ToString() string {
+	return "mtch_cnstr_" + match.Status.ToString()
+}
