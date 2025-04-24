@@ -8,11 +8,11 @@ import (
 )
 
 type StaticNode struct {
-	Next         []models.Node
-	Request      httphandler.Request
-	Response     httphandler.HTTPResponse
-	Constraints  []models.Constraint
-	match_status models.MatchStatus
+	Next        []models.Node
+	Request     httphandler.Request
+	Response    httphandler.HTTPResponse
+	Constraints []models.Constraint
+	Failed      bool
 }
 
 func (node *StaticNode) Execute(client *http.Client) (httphandler.HTTPResponse, error) {
@@ -30,12 +30,10 @@ func (node *StaticNode) Check() bool {
 	for _, constraint := range node.Constraints {
 		status = constraint.Constrain(node)
 		if status.Failed {
-			node.match_status = status
-			return false
+			node.Failed = true
 		}
 	}
-	node.match_status = status
-	return true
+	return !node.Failed
 
 }
 
@@ -72,5 +70,5 @@ func (node *StaticNode) ToString() string {
 }
 
 func (node *StaticNode) Successful() bool {
-	return !node.match_status.Failed
+	return !node.Failed
 }

@@ -10,7 +10,7 @@ type Match_Store_Constraint struct {
 
 func (match *Match_Store_Constraint) Constrain(node models.Node) models.MatchStatus {
 	status := match.InnerConstraint.Constrain(node)
-	if node.Successful() {
+	if !status.Failed {
 		(*match.Storage)[match.Varname] = models.TypedVariable{
 			Value: status.MatchedValue,
 			Type:  match.InnerConstraint.Type,

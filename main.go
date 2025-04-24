@@ -45,10 +45,12 @@ func main() {
 				Map["q"] = key.Value.(string)
 				return Map
 			},
-			nil)
+			nil).AddExistConstraint([]string{"docs"}, models.TypeArray)
 
 	if !builder.Run() {
 		fmt.Printf("FAILED!!!\n")
+	} else {
+		fmt.Printf("Success!!!\n")
 	}
 
 	builder.PrintList()

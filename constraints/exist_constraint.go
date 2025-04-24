@@ -35,7 +35,22 @@ func (match *Exist_Constraint) constrain(node models.Node) models.MatchStatus {
 
 	//	important to seperate the loop into two parts to acquire the final desired field name
 	key := match.Field[len(match.Field)-1]
-	actual := obj[key]
+	actual, exists := obj[key] //	check if the field exists in the object or not
+	if !exists {
+		msg := ""
+		for _, subField := range match.Field[:len(match.Field)-1] {
+			msg += subField + "."
+		}
+
+		finalSubField := match.Field[len(match.Field)-1]
+		msg += finalSubField
+
+		return models.MatchStatus{
+			Failed:         true,
+			Message:        fmt.Sprintf("field: '%s' doesn't exist", msg),
+			Failed_at_node: &node,
+		}
+	}
 
 	switch match.Type {
 	case models.TypeString:
@@ -61,7 +76,7 @@ func (match *Exist_Constraint) constrain(node models.Node) models.MatchStatus {
 		if !valid {
 			return models.MatchStatus{
 				Failed:         true,
-				Message:        fmt.Sprintf("field: %s doesn't match expected type: %s", key, match.Type),
+				Message:        fmt.Sprintf("field: %s with type: %T doesn't match expected type: %s", key, actual, match.Type),
 				Failed_at_node: &node,
 			}
 		}
@@ -70,7 +85,7 @@ func (match *Exist_Constraint) constrain(node models.Node) models.MatchStatus {
 		if !valid {
 			return models.MatchStatus{
 				Failed:         true,
-				Message:        fmt.Sprintf("field: %s doesn't match expected type: %s", key, match.Type),
+				Message:        fmt.Sprintf("field: %s with type: %T doesn't match expected type: %s", key, actual, match.Type),
 				Failed_at_node: &node,
 			}
 		}
@@ -79,7 +94,7 @@ func (match *Exist_Constraint) constrain(node models.Node) models.MatchStatus {
 		if !valid {
 			return models.MatchStatus{
 				Failed:         true,
-				Message:        fmt.Sprintf("field: %s doesn't match expected type: %s", key, match.Type),
+				Message:        fmt.Sprintf("field: %s with type: %T doesn't match expected type: %s", key, actual, match.Type),
 				Failed_at_node: &node,
 			}
 		}

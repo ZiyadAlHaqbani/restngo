@@ -11,11 +11,12 @@ import (
 )
 
 func CreateNewBuilder() *TestBuilder {
+	// storage := new(map[string]models.TypedVariable)
 	builder := &TestBuilder{
 		head:    nil,
 		current: nil,
 		client:  http.DefaultClient,
-		Storage: map[string]models.TypedVariable{},
+		Storage: &map[string]models.TypedVariable{},
 	}
 
 	return builder
@@ -25,7 +26,7 @@ type TestBuilder struct {
 	head    models.Node
 	current models.Node
 	client  *http.Client
-	Storage map[string]models.TypedVariable
+	Storage *map[string]models.TypedVariable
 }
 
 // TODO: change to take url and method
@@ -55,7 +56,7 @@ func (builder *TestBuilder) AddDynamicNode(url string, method models.HTTPMethod,
 		}},
 		QueryBuilderFunc: queryBuilder,
 		BodyBuilderFunc:  bodyBuilder,
-		Storage:          &builder.Storage,
+		Storage:          builder.Storage,
 	}
 
 	if builder.head == nil {
@@ -67,6 +68,10 @@ func (builder *TestBuilder) AddDynamicNode(url string, method models.HTTPMethod,
 	builder.current = new
 
 	return builder
+}
+
+func (builder *TestBuilder) AddStaticNodeBranch() *TestBuilder {
+	return nil
 }
 
 func (builder *TestBuilder) AddMatchConstraint(fields []string, expectedValue interface{}, expectedType models.MatchType) *TestBuilder {
@@ -86,7 +91,7 @@ func (builder *TestBuilder) AddMatchStoreConstraint(fields []string, expectedVal
 			Type:     expectedType,
 			Expected: expectedValue,
 		},
-		Storage: &builder.Storage,
+		Storage: builder.Storage,
 		Varname: varname,
 	}
 	builder.current.AddConstraint(&constraint)
@@ -108,7 +113,7 @@ func (builder *TestBuilder) AddExistStoreConstraint(fields []string, expectedTyp
 			Field: fields,
 			Type:  expectedType,
 		},
-		Storage: &builder.Storage,
+		Storage: builder.Storage,
 		Varname: varname,
 	}
 	builder.current.AddConstraint(&constraint)
@@ -120,7 +125,15 @@ func (builder *TestBuilder) PrintList() {
 }
 func (builder *TestBuilder) printListHelper(node models.Node) {
 
-	fmt.Printf("\n\t%+v\n", node.ToString())
+	type_str := ""
+	switch node.(type) {
+	case *nodes.StaticNode:
+		type_str = "Static_Node"
+	case *nodes.DynamicNode:
+		type_str = "Dynamic_Node"
+	}
+
+	fmt.Printf("\n\t%s: %+v\n", type_str, node.ToString())
 	fmt.Printf("\t")
 
 	if node == nil || !node.Successful() {
