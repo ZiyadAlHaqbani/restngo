@@ -6,28 +6,37 @@ import (
 )
 
 type Exist_Constraint struct {
-	Field []string         //	e.g ["user", "age"] would access user.age
-	Type  models.MatchType //	defines the expected type of the final field in the 'Field' array
+	Field []string //	e.g ["user", "age"] would access user.age
+
+	/* TODO: REMOVE LATER */
+	__Field string           //	experimental way to access fields
+	Type    models.MatchType //	defines the expected type of the final field in the 'Field' array
 
 	Status models.MatchStatus
 }
 
+//	func (match *Exist_Constraint) Constrain(node models.Node) models.MatchStatus {
+//		status := match.constrain(node)
+//		match.Status = status
+//		return status
+//	}
 func (match *Exist_Constraint) Constrain(node models.Node) models.MatchStatus {
 	status := match.constrain(node)
 	match.Status = status
 	return status
 }
+
 func (match *Exist_Constraint) constrain(node models.Node) models.MatchStatus {
 	resp := node.GetResp()
 
-	var obj map[string]interface{}
+	obj := resp.Body
 	for _, key := range match.Field[:len(match.Field)-1] {
 		var valid bool
 		obj, valid = resp.Body[key].(map[string]interface{})
 		if !valid {
 			return models.MatchStatus{
 				Failed:         true,
-				Message:        fmt.Sprintf("object: %+v doesn't include field: %s", obj, key),
+				Message:        fmt.Sprintf("object: %+v doesn't include sub-field: %s", obj, key),
 				Failed_at_node: &node,
 			}
 		}
@@ -98,6 +107,9 @@ func (match *Exist_Constraint) constrain(node models.Node) models.MatchStatus {
 				Failed_at_node: &node,
 			}
 		}
+
+	default:
+		panic("ERROR: user assigned type outside of the defined types in 'MatchType'")
 
 	}
 
