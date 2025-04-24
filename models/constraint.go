@@ -1,6 +1,8 @@
 package models
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // constrain nodes, where at the end of each step, the response must satisfy all related constraints
 type Constraint interface {
@@ -10,7 +12,9 @@ type Constraint interface {
 type MatchStatus struct {
 	Failed         bool
 	Message        string
-	Failed_at_node *Node
+	Failed_at_node *Node //	not used so far, potential for future error handling
+	MatchedValue   interface{}
+	ValueType      MatchType
 }
 
 func (match *MatchStatus) ToString() string {
