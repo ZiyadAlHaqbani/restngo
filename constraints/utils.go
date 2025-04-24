@@ -59,6 +59,7 @@ func matchLists(a []interface{}, b []interface{}) (bool, string) {
 
 	return true, ""
 }
+
 func matchMaps(a map[string]interface{}, b map[string]interface{}) (bool, string) {
 	if len(a) != len(b) {
 		return false, fmt.Sprintf("expected list of length: %d but found list of length: %d", len(b), len(a))

@@ -13,13 +13,19 @@ type MatchStatus struct {
 	Failed         bool
 	Message        string
 	Failed_at_node *Node //	not used so far, potential for future error handling
-	MatchedValue   interface{}
-	ValueType      MatchType
+
+	//	used to allow '_Store' constraints to store values in global 'Storage' context
+	MatchedValue interface{}
+	ValueType    MatchType
 }
 
 func (match *MatchStatus) ToString() string {
 	if !match.Failed {
-		return match.Message
+		temp := ""
+		if match.MatchedValue != nil {
+			temp += fmt.Sprintf("found Value '%+v, %T' with expected type '%s'", match.MatchedValue, match.MatchedValue, match.ValueType)
+		}
+		return temp
 	}
 	temp := ""
 	temp = fmt.Sprintf("%sreason: %+v\n", temp, match.Message)

@@ -12,7 +12,7 @@ func (match *Match_Store_Constraint) Constrain(node models.Node) models.MatchSta
 	status := match.InnerConstraint.Constrain(node)
 	if node.Successful() {
 		(*match.Storage)[match.Varname] = models.TypedVariable{
-			Value: match.InnerConstraint.Expected,
+			Value: status.MatchedValue,
 			Type:  match.InnerConstraint.Type,
 		}
 	}

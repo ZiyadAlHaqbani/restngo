@@ -24,15 +24,15 @@ func main() {
 	// }
 
 	builder.AddStaticNode(httphandler.Request{
-		Url:    "http://localhost:8080/auth/register?email=test@mail.com&passwordHash=123456",
-		Method: string(models.POST),
+		Url:    "http://httpbin.org/json",
+		Method: string(models.GET),
 		// Body:   *bytes.NewBuffer(req_bytes),
 	}).AddMatchStoreConstraint(
-		[]string{"slideshow"},
+		[]string{"slideshow", "author"},
 		"Yours Truly",
 		models.TypeString,
 		"authorName",
-	).AddDynamicNode("http://google.com/search", models.GET,
+	).AddDynamicNode("https://openlibrary.org/search.json", models.GET,
 		func(m *map[string]models.TypedVariable) map[string]string {
 			key := (*m)["authorName"]
 			Map := map[string]string{}
