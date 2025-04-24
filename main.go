@@ -35,8 +35,8 @@ func main() {
 			models.TypeString,
 			"authorName",
 		).
-		AddExistsConstraint(
-			[]string{"slideshow", "author"}, models.TypeString,
+		AddExistStoreConstraint(
+			[]string{"slideshow", "author"}, models.TypeString, "authorExists",
 		).
 		AddDynamicNode("https://openlibrary.org/search.json", models.GET,
 			func(m *map[string]models.TypedVariable) map[string]string {
