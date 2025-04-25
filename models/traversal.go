@@ -1,22 +1,22 @@
 package models
 
 type Traversal struct {
-	by_index bool
-	by_field bool
-	index    int
-	field    string
+	By_index bool
+	By_field bool
+	Index    int
+	Field    string
 }
 
 func IndexTraversal(index int) Traversal {
 	return Traversal{
-		by_index: true,
-		index:    index,
+		By_index: true,
+		Index:    index,
 	}
 }
 
 func FieldTraversal(field string) Traversal {
 	return Traversal{
-		by_field: true,
-		field:    field,
+		By_field: true,
+		Field:    field,
 	}
 }

@@ -123,19 +123,37 @@ func matchMaps(a map[string]interface{}, b map[string]interface{}) (bool, string
 	return true, ""
 }
 
-func traverse(field string, obj map[string]interface{}) interface{} {
+func traverse(field string, obj map[string]interface{}) (interface{}, string) {
 
 	var traversals []models.Traversal
 
 	traversals, found := parseJSONPath(field)
-	if found {
-		return nil
+	if !found {
+		fmt.Printf("Traversals: %+v\n\n", traversals)
+		log.Printf("WARNING: detected a match with empty field, are you sure you didn't forget to specify a field for a match operation?")
+		log.Printf("WARNING: since no field was specified, following object will be returned: %.100s...", fmt.Sprintf("%+v", obj)) //	solution to golang quirk with '%+v'
+		return obj, ""
 	}
 
-	fmt.Printf("Traversals: %+v\n\n", traversals)
-	log.Printf("WARNING: detected a match with empty field, are you sure you didn't forget to specify a field for a match operation?")
-	log.Printf("WARNING: since no field was specified, following object will be returned: %.100s...", fmt.Sprintf("%+v", obj)) //	solution to golang quirk with '%+v'
-	return obj
+	temp_obj := obj
+
+	for _, traversal := range traversals {
+		var valid bool
+		if traversal.By_field {
+			temp_obj, valid = temp_obj[traversal.Field].(map[string]interface{})
+			if !valid {
+				return nil, fmt.Sprintf("field: %s doesn't exist in object: %.100s", traversal.Field, fmt.Sprintf("%+v", obj))
+			}
+
+		} else if traversal.By_index {
+
+		} else {
+			log.Fatalf("ERROR: malformed traversal: %+v, is neither field nor index.", traversal)
+		}
+	}
+
+	panic("TODO: implement the traversal logic")
+	return nil, ""
 }
 
 func parseJSONPath(field string) (traversals []models.Traversal, found bool) {
