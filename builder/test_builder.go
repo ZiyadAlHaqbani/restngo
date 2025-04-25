@@ -107,6 +107,15 @@ func (builder *TestBuilder) AddExistConstraint(fields []string, expectedType mod
 	return builder
 }
 
+func (builder *TestBuilder) AddExistConstraint_(field string, expectedType models.MatchType) *TestBuilder {
+	constraint := constraints.Exist_Constraint{
+		Field_: field,
+		Type:   expectedType,
+	}
+	builder.current.AddConstraint(&constraint)
+	return builder
+}
+
 func (builder *TestBuilder) AddExistStoreConstraint(fields []string, expectedType models.MatchType, varname string) *TestBuilder {
 	constraint := constraints.Exist_Store_Constraint{
 		InnerConstraint: constraints.Exist_Constraint{

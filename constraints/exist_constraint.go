@@ -9,8 +9,8 @@ type Exist_Constraint struct {
 	Field []string //	e.g ["user", "age"] would access user.age
 
 	/* TODO: REMOVE LATER */
-	__Field string           //	experimental way to access fields
-	Type    models.MatchType //	defines the expected type of the final field in the 'Field' array
+	Field_ string           //	experimental way to access fields
+	Type   models.MatchType //	defines the expected type of the final field in the 'Field' array
 
 	Status models.MatchStatus
 }
@@ -29,6 +29,12 @@ func (match *Exist_Constraint) Constrain(node models.Node) models.MatchStatus {
 func (match *Exist_Constraint) constrain(node models.Node) models.MatchStatus {
 	resp := node.GetResp()
 
+	traverse(match.Field_, resp.Body)
+
+	if len(match.Field) == 0 {
+		return models.MatchStatus{Failed: true}
+	}
+
 	obj := resp.Body
 	for _, key := range match.Field[:len(match.Field)-1] {
 		var valid bool
@@ -45,6 +51,7 @@ func (match *Exist_Constraint) constrain(node models.Node) models.MatchStatus {
 	//	important to seperate the loop into two parts to acquire the final desired field name
 	key := match.Field[len(match.Field)-1]
 	actual, exists := obj[key] //	check if the field exists in the object or not
+
 	if !exists {
 		msg := ""
 		for _, subField := range match.Field[:len(match.Field)-1] {

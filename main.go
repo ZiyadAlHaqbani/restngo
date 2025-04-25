@@ -45,7 +45,7 @@ func main() {
 				Map["q"] = key.Value.(string)
 				return Map
 			},
-			nil).AddExistConstraint([]string{"q"}, models.TypeString)
+			nil).AddExistConstraint([]string{"q"}, models.TypeString).AddExistConstraint_("[12].q[12].q.ahmad[12][432432]", models.TypeArray)
 
 	if !builder.Run() {
 		fmt.Printf("FAILED!!!\n")
