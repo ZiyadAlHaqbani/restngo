@@ -123,14 +123,14 @@ func matchMaps(a map[string]interface{}, b map[string]interface{}) (bool, string
 	return true, ""
 }
 
-func traverse(field string, obj map[string]interface{}) (interface{}, string) {
+func traverse(field string, obj interface{}) (interface{}, string) {
 
 	var traversals []models.Traversal
 
 	traversals, found := parseJSONPath(field)
 	if !found {
 		fmt.Printf("Traversals: %+v\n\n", traversals)
-		log.Printf("WARNING: detected a match with empty field, are you sure you didn't forget to specify a field for a match operation?")
+		log.Printf("WARNING: detected a constraint with empty field, are you sure you didn't forget to specify a field for the constraint?")
 		log.Printf("WARNING: since no field was specified, following object will be returned: %.100s...", fmt.Sprintf("%+v", obj)) //	solution to golang quirk with '%+v'
 		return obj, ""
 	}
@@ -138,15 +138,25 @@ func traverse(field string, obj map[string]interface{}) (interface{}, string) {
 	temp_obj := obj
 
 	for _, traversal := range traversals {
-		var valid bool
 		if traversal.By_field {
-			temp_obj, valid = temp_obj[traversal.Field].(map[string]interface{})
+			temp_dict, valid := temp_obj.(map[string]interface{})
+			if !valid {
+				return nil, fmt.Sprintf("object is type: '%T' and not an object for field: %s", temp_obj, traversal.Field)
+			}
+			temp_obj, valid = temp_dict[traversal.Field]
 			if !valid {
 				return nil, fmt.Sprintf("field: %s doesn't exist in object: %.100s", traversal.Field, fmt.Sprintf("%+v", obj))
 			}
 
 		} else if traversal.By_index {
-
+			temp_list, valid := temp_obj.([]interface{})
+			if !valid {
+				return nil, fmt.Sprintf("object is type: '%T' and not an a list for index: %d", temp_obj, traversal.Index)
+			}
+			if len(temp_list) <= traversal.Index {
+				return nil, fmt.Sprintf("index: %d is outside the bounds of list of length: %d", traversal.Index, len(temp_list))
+			}
+			temp_obj = temp_list[traversal.Index]
 		} else {
 			log.Fatalf("ERROR: malformed traversal: %+v, is neither field nor index.", traversal)
 		}
@@ -195,7 +205,7 @@ func parseJSONPath(field string) (traversals []models.Traversal, found bool) {
 
 		field_str := field[start:i]
 		traversals = append(traversals, models.FieldTraversal(field_str))
-		i++
+		// i++
 	}
 
 	for i < len(field) {
@@ -209,7 +219,6 @@ func parseJSONPath(field string) (traversals []models.Traversal, found bool) {
 
 			field_str := field[start:i]
 			traversals = append(traversals, models.FieldTraversal(field_str))
-			// i++
 
 		case '[':
 			//	parsing index brackets

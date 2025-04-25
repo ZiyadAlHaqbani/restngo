@@ -29,11 +29,16 @@ func (match *Exist_Constraint) Constrain(node models.Node) models.MatchStatus {
 func (match *Exist_Constraint) constrain(node models.Node) models.MatchStatus {
 	resp := node.GetResp()
 
-	traverse(match.Field_, resp.Body)
-
-	if len(match.Field) == 0 {
-		return models.MatchStatus{Failed: true}
+	result, msg := traverse(match.Field_, resp.Tets_Body)
+	if result == nil {
+		return models.MatchStatus{
+			Failed:  true,
+			Message: msg}
 	}
+
+	// if len(match.Field) == 0 {
+	// 	return models.MatchStatus{Failed: true}
+	// }
 
 	obj := resp.Body
 	for _, key := range match.Field[:len(match.Field)-1] {

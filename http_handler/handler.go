@@ -13,9 +13,10 @@ func Ptr[T any](t T) *T {
 }
 
 type HTTPResponse struct {
-	Status  int
-	Headers http.Header
-	Body    map[string]interface{}
+	Status    int
+	Headers   http.Header
+	Body      map[string]interface{}
+	Tets_Body interface{} //	TODO: remove later, test for storing arbitrary json or list
 }
 
 func tabs(tabs int) string {
@@ -119,18 +120,25 @@ func Handle(client *http.Client, request Request) (*HTTPResponse, error) {
 
 	defer resp.Body.Close()
 
-	var body_json map[string]interface{}
 	resp_body_bytes, resp_err := io.ReadAll(resp.Body)
+
+	var body_json map[string]interface{}
 	if resp_err != nil {
 		return nil, fmt.Errorf("ERROR: failed to read the bytes from the response body %+v", resp_err)
 	}
-
 	json.Unmarshal(resp_body_bytes, &body_json)
 
+	var json_interface interface{}
+	if resp_err != nil {
+		return nil, fmt.Errorf("ERROR: failed to read the bytes from the response body INTERFACE %+v", resp_err)
+	}
+	json.Unmarshal(resp_body_bytes, &json_interface)
+
 	return &HTTPResponse{
-			Status:  resp.StatusCode,
-			Headers: resp.Request.Header,
-			Body:    body_json,
+			Status:    resp.StatusCode,
+			Headers:   resp.Request.Header,
+			Body:      body_json,
+			Tets_Body: json_interface,
 		},
 		nil
 }
