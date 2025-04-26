@@ -54,9 +54,37 @@ Tests are constructed using a **TestBuilder**, which provides:
 
 ---
 
-## Summary
+##  Example
 
-- Structured, typed HTTP test flows.
-- Dynamic request building and response constraint checking.
-- Context-aware variable storage between requests.
-- Extensible for future work (e.g., Not Exist constraints).
+```go
+//start of the program
+builder := test_builder.CreateNewBuilder()
+builder.
+    AddStaticNode(
+        "http://httpbin.org/json",
+        models.GET,
+        nil,
+    ).
+    AddMatchStoreConstraint(
+        "slideshow.author",
+        "Yours Truly",
+        models.TypeString,
+        "authorName",
+    ).
+    AddDynamicNode("https://openlibrary.org/search.json", models.GET,
+        func(m *map[string]models.TypedVariable) map[string]string {
+            key := (*m)["authorName"]
+            Map := map[string]string{}
+            Map["q"] = key.Value.(string)
+            return Map
+        },
+        nil).AddExistConstraint("docs[2].author_key[0]", models.TypeString)
+
+status := builder.Run()
+fmt.Printf("Test Passed: %v", status)
+
+//	option to print the contents of the test
+builder.PrintList()
+
+//program end
+```

@@ -8,20 +8,8 @@ import (
 
 func main() {
 
-	fmt.Printf("start!\n")
-
+	//	start of the program
 	builder := test_builder.CreateNewBuilder()
-
-	// req_body := map[string]string{
-	// 	"email":        "test@mail.com",
-	// 	"passwordHash": "123456",
-	// }
-
-	// req_bytes, err := json.Marshal(req_body)
-	// if err != nil {
-	// 	panic("json ERROR")
-	// }
-
 	builder.
 		AddStaticNode(
 			"http://httpbin.org/json",
@@ -43,13 +31,11 @@ func main() {
 			},
 			nil).AddExistConstraint("docs[2].author_key[0]", models.TypeString)
 
-	if !builder.Run() {
-		fmt.Printf("FAILED!!!\n")
-	} else {
-		fmt.Printf("Success!!!\n")
-	}
+	status := builder.Run()
+	fmt.Printf("Test Passed: %v", status)
 
+	//	option to print the contents of the test
 	builder.PrintList()
 
-	fmt.Printf("end!\n")
+	//program end
 }
