@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	test_builder "htestp/builder"
-	httphandler "htestp/http_handler"
 	"htestp/models"
 )
 
@@ -24,11 +23,11 @@ func main() {
 	// }
 
 	builder.
-		AddStaticNode(httphandler.Request{
-			Url:    "http://httpbin.org/json",
-			Method: string(models.GET),
-			// Body:   *bytes.NewBuffer(req_bytes),
-		}).
+		AddStaticNode(
+			"http://httpbin.org/json",
+			models.GET,
+			nil,
+		).
 		AddMatchStoreConstraint(
 			"slideshow.author",
 			"Yours Truly",

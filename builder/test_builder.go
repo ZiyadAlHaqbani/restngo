@@ -1,6 +1,7 @@
 package test_builder
 
 import (
+	"bytes"
 	"fmt"
 	"htestp/constraints"
 	httphandler "htestp/http_handler"
@@ -29,9 +30,18 @@ type TestBuilder struct {
 	Storage *map[string]models.TypedVariable
 }
 
-// TODO: change to take url and method
 // TODO: add AddStaticNodeRaw
-func (builder *TestBuilder) AddStaticNode(request httphandler.Request) *TestBuilder {
+func (builder *TestBuilder) AddStaticNode(url string, method models.HTTPMethod, body *bytes.Buffer) *TestBuilder {
+
+	if body == nil {
+
+	}
+
+	request := httphandler.Request{
+		Url:    url,
+		Method: string(method),
+		Body:   *body,
+	}
 
 	new := &nodes.StaticNode{Request: request}
 	if builder.head == nil {
@@ -47,6 +57,9 @@ func (builder *TestBuilder) AddStaticNode(request httphandler.Request) *TestBuil
 }
 
 // TODO: add AddDynamicNodeRaw
+//
+//	dynamic nodes use data from the global context to build their own queries and bodies, must be noted that the query builder
+//	assumes your url does not include a query
 func (builder *TestBuilder) AddDynamicNode(url string, method models.HTTPMethod, queryBuilder func(*map[string]models.TypedVariable) map[string]string, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
 
 	new := &nodes.DynamicNode{
@@ -70,8 +83,34 @@ func (builder *TestBuilder) AddDynamicNode(url string, method models.HTTPMethod,
 	return builder
 }
 
-func (builder *TestBuilder) AddStaticNodeBranch() *TestBuilder {
-	return nil
+func (builder *TestBuilder) AddStaticNodeBranch(url string, method models.HTTPMethod, body *bytes.Buffer) *TestBuilder {
+
+	//	construct the new static node
+	request := httphandler.Request{
+		Url:    url,
+		Method: string(method),
+		Body:   *body,
+	}
+
+	new := nodes.StaticNode{
+		Request: request,
+	}
+
+	//	add the new node to the existing node tree
+	//	but don't proceed to the next node
+	builder.current.AddNode(&new)
+
+	//	TODO: look into making the head the same , or add a new flag to determine if the builder is a branch
+	//	TODO: builder to fix issues with using .Run() on a branch builder
+	//	construct the new branch builder, this builder build on the existing tree but it starts from the new branch
+	branchBuilder := TestBuilder{
+		head:    &new,
+		current: &new,
+		client:  builder.client,
+		Storage: builder.Storage,
+	}
+
+	return &branchBuilder
 }
 
 func (builder *TestBuilder) AddMatchConstraint(field string, expectedValue interface{}, expectedType models.MatchType) *TestBuilder {
