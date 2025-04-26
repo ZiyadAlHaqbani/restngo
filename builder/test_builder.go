@@ -9,6 +9,7 @@ import (
 	"htestp/nodes"
 	"log"
 	"net/http"
+	"sync"
 )
 
 func CreateNewBuilder() *TestBuilder {
@@ -33,14 +34,13 @@ type TestBuilder struct {
 // TODO: add AddStaticNodeRaw
 func (builder *TestBuilder) AddStaticNode(url string, method models.HTTPMethod, body *bytes.Buffer) *TestBuilder {
 
-	if body == nil {
-
-	}
-
 	request := httphandler.Request{
 		Url:    url,
 		Method: string(method),
-		Body:   *body,
+	}
+
+	if body != nil {
+		request.Body = *body
 	}
 
 	new := &nodes.StaticNode{Request: request}
@@ -83,13 +83,23 @@ func (builder *TestBuilder) AddDynamicNode(url string, method models.HTTPMethod,
 	return builder
 }
 
+// WARNING: this is a dangerous function that shouldn't be used in most cases, it sets the current node of the caller
+// builder to the callee builder, this will terminate the old branch if there is no builder refrencing it
+func (builder *TestBuilder) SetBranchTo(callee *TestBuilder) {
+	log.Print("WARNING: you called SetBranchTo() which can be unsafe, are you sure you need to use it?")
+	builder.current = callee.current
+}
+
 func (builder *TestBuilder) AddStaticNodeBranch(url string, method models.HTTPMethod, body *bytes.Buffer) *TestBuilder {
 
 	//	construct the new static node
 	request := httphandler.Request{
 		Url:    url,
 		Method: string(method),
-		Body:   *body,
+	}
+
+	if body != nil {
+		request.Body = *body
 	}
 
 	new := nodes.StaticNode{
@@ -204,11 +214,26 @@ func (builder *TestBuilder) runHelper(node models.Node) bool {
 		return false
 	}
 
-	for _, nextNode := range node.GetNextNodes() {
-		if !builder.runHelper(nextNode) {
-			return false
-		}
+	if len(node.GetNextNodes()) == 1 {
+		return builder.runHelper(node.GetNextNodes()[0])
 	}
 
-	return true
+	// branches will still run even if a node in the level fails.
+	success := true
+	var success_mux sync.Mutex
+	var wg sync.WaitGroup
+	wg.Add(len(node.GetNextNodes()))
+	for _, nextNode := range node.GetNextNodes() {
+		go func() {
+			defer wg.Done()
+			Successful := builder.runHelper(nextNode)
+			if !Successful {
+				success_mux.Lock()
+				defer success_mux.Unlock()
+				success = false
+			}
+		}()
+	}
+
+	return success
 }

@@ -16,7 +16,7 @@ type DynamicNode struct {
 	QueryBuilderFunc func(storage *map[string]models.TypedVariable) map[string]string
 	BodyBuilderFunc  func(storage *map[string]models.TypedVariable) map[string]interface{}
 	Storage          *map[string]models.TypedVariable
-	Next             models.Node
+	Next             []models.Node
 }
 
 // Execute(client *http.Client) (httphandler.HTTPResponse, error)
@@ -74,11 +74,11 @@ func (node *DynamicNode) AddConstraint(constraint models.Constraint) {
 }
 
 func (node *DynamicNode) GetNextNodes() []models.Node {
-	return node.InnerNode.GetNextNodes()
+	return node.Next
 }
 
 func (node *DynamicNode) AddNode(new models.Node) {
-	node.Next = new
+	node.Next = append(node.Next, new)
 }
 
 func (node *DynamicNode) ToString() string {
