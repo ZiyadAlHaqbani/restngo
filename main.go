@@ -30,13 +30,10 @@ func main() {
 			// Body:   *bytes.NewBuffer(req_bytes),
 		}).
 		AddMatchStoreConstraint(
-			[]string{"slideshow", "author"},
+			"slideshow.author",
 			"Yours Truly",
 			models.TypeString,
 			"authorName",
-		).
-		AddExistStoreConstraint(
-			[]string{"slideshow", "author"}, models.TypeString, "authorExists",
 		).
 		AddDynamicNode("https://openlibrary.org/search.json", models.GET,
 			func(m *map[string]models.TypedVariable) map[string]string {
@@ -45,7 +42,7 @@ func main() {
 				Map["q"] = key.Value.(string)
 				return Map
 			},
-			nil).AddExistConstraint([]string{"q"}, models.TypeString).AddExistConstraint_("docs[2].author_key[0]", models.TypeArray)
+			nil).AddExistConstraint("docs[2].author_key[0]", models.TypeString)
 
 	if !builder.Run() {
 		fmt.Printf("FAILED!!!\n")

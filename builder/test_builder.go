@@ -74,9 +74,9 @@ func (builder *TestBuilder) AddStaticNodeBranch() *TestBuilder {
 	return nil
 }
 
-func (builder *TestBuilder) AddMatchConstraint(fields []string, expectedValue interface{}, expectedType models.MatchType) *TestBuilder {
+func (builder *TestBuilder) AddMatchConstraint(field string, expectedValue interface{}, expectedType models.MatchType) *TestBuilder {
 	constraint := constraints.Match_Constraint{
-		Field:    fields,
+		Field:    field,
 		Type:     expectedType,
 		Expected: expectedValue,
 	}
@@ -84,10 +84,10 @@ func (builder *TestBuilder) AddMatchConstraint(fields []string, expectedValue in
 	return builder
 }
 
-func (builder *TestBuilder) AddMatchStoreConstraint(fields []string, expectedValue interface{}, expectedType models.MatchType, varname string) *TestBuilder {
+func (builder *TestBuilder) AddMatchStoreConstraint(field string, expectedValue interface{}, expectedType models.MatchType, varname string) *TestBuilder {
 	constraint := constraints.Match_Store_Constraint{
 		InnerConstraint: constraints.Match_Constraint{
-			Field:    fields,
+			Field:    field,
 			Type:     expectedType,
 			Expected: expectedValue,
 		},
@@ -98,28 +98,19 @@ func (builder *TestBuilder) AddMatchStoreConstraint(fields []string, expectedVal
 	return builder
 }
 
-func (builder *TestBuilder) AddExistConstraint(fields []string, expectedType models.MatchType) *TestBuilder {
+func (builder *TestBuilder) AddExistConstraint(field string, expectedType models.MatchType) *TestBuilder {
 	constraint := constraints.Exist_Constraint{
-		Field: fields,
+		Field: field,
 		Type:  expectedType,
 	}
 	builder.current.AddConstraint(&constraint)
 	return builder
 }
 
-func (builder *TestBuilder) AddExistConstraint_(field string, expectedType models.MatchType) *TestBuilder {
-	constraint := constraints.Exist_Constraint{
-		Field_: field,
-		Type:   expectedType,
-	}
-	builder.current.AddConstraint(&constraint)
-	return builder
-}
-
-func (builder *TestBuilder) AddExistStoreConstraint(fields []string, expectedType models.MatchType, varname string) *TestBuilder {
+func (builder *TestBuilder) AddExistStoreConstraint(field string, expectedType models.MatchType, varname string) *TestBuilder {
 	constraint := constraints.Exist_Store_Constraint{
 		InnerConstraint: constraints.Exist_Constraint{
-			Field: fields,
+			Field: field,
 			Type:  expectedType,
 		},
 		Storage: builder.Storage,

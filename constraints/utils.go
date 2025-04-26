@@ -162,8 +162,7 @@ func traverse(field string, obj interface{}) (interface{}, string) {
 		}
 	}
 
-	panic("TODO: implement the traversal logic")
-	return nil, ""
+	return temp_obj, ""
 }
 
 func parseJSONPath(field string) (traversals []models.Traversal, found bool) {
@@ -254,4 +253,62 @@ func parseJSONPath(field string) (traversals []models.Traversal, found bool) {
 
 	found = true
 	return
+}
+
+func checkType(value interface{}, data_type models.MatchType, field string) models.MatchStatus {
+
+	switch data_type {
+	case models.TypeString:
+		_, valid := value.(string)
+		if !valid {
+			return models.MatchStatus{
+				Failed:  true,
+				Message: fmt.Sprintf("field: %s doesn't match expected type: %s", field, data_type),
+			}
+		}
+	case models.TypeFloat:
+		_, valid := value.(float64)
+		if !valid {
+			return models.MatchStatus{
+				Failed:  true,
+				Message: fmt.Sprintf("field: %s doesn't match expected type: %s", field, data_type),
+			}
+		}
+	case models.TypeBool:
+		_, valid := value.(bool)
+		if !valid {
+			return models.MatchStatus{
+				Failed:  true,
+				Message: fmt.Sprintf("field: %s with type: %T doesn't match expected type: %s", field, value, data_type),
+			}
+		}
+	case models.TypeArray:
+		_, valid := value.([]interface{})
+		if !valid {
+			return models.MatchStatus{
+				Failed:  true,
+				Message: fmt.Sprintf("field: %s with type: %T doesn't match expected type: %s", field, value, data_type),
+			}
+		}
+	case models.TypeObject:
+		_, valid := value.(map[string]interface{})
+		if !valid {
+			return models.MatchStatus{
+				Failed:  true,
+				Message: fmt.Sprintf("field: %s with type: %T doesn't match expected type: %s", field, value, data_type),
+			}
+		}
+
+	default:
+		panic("ERROR: user assigned type outside of the defined types in 'MatchType'")
+
+	}
+
+	return models.MatchStatus{
+		Failed: false,
+		// Failed_at_node: &node,
+		ValueType:    data_type,
+		MatchedValue: value,
+	}
+
 }

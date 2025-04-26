@@ -1,16 +1,12 @@
 package constraints
 
 import (
-	"fmt"
 	"htestp/models"
 )
 
 type Exist_Constraint struct {
-	Field []string //	e.g ["user", "age"] would access user.age
-
-	/* TODO: REMOVE LATER */
-	Field_ string           //	experimental way to access fields
-	Type   models.MatchType //	defines the expected type of the final field in the 'Field' array
+	Field string
+	Type  models.MatchType //	defines the expected type of the final field in the 'Field' array
 
 	Status models.MatchStatus
 }
@@ -20,117 +16,25 @@ type Exist_Constraint struct {
 //		match.Status = status
 //		return status
 //	}
-func (match *Exist_Constraint) Constrain(node models.Node) models.MatchStatus {
-	status := match.constrain(node)
-	match.Status = status
+func (exist *Exist_Constraint) Constrain(node models.Node) models.MatchStatus {
+	status := exist.constrain(node)
+	exist.Status = status
 	return status
 }
 
-func (match *Exist_Constraint) constrain(node models.Node) models.MatchStatus {
+func (exist *Exist_Constraint) constrain(node models.Node) models.MatchStatus {
 	resp := node.GetResp()
 
-	result, msg := traverse(match.Field_, resp.Tets_Body)
+	result, msg := traverse(exist.Field, resp.Body)
 	if result == nil {
 		return models.MatchStatus{
 			Failed:  true,
 			Message: msg}
 	}
 
-	// if len(match.Field) == 0 {
-	// 	return models.MatchStatus{Failed: true}
-	// }
-
-	obj := resp.Body
-	for _, key := range match.Field[:len(match.Field)-1] {
-		var valid bool
-		obj, valid = resp.Body[key].(map[string]interface{})
-		if !valid {
-			return models.MatchStatus{
-				Failed:         true,
-				Message:        fmt.Sprintf("object: %+v doesn't include sub-field: %s", obj, key),
-				Failed_at_node: &node,
-			}
-		}
-	}
-
-	//	important to seperate the loop into two parts to acquire the final desired field name
-	key := match.Field[len(match.Field)-1]
-	actual, exists := obj[key] //	check if the field exists in the object or not
-
-	if !exists {
-		msg := ""
-		for _, subField := range match.Field[:len(match.Field)-1] {
-			msg += subField + "."
-		}
-
-		finalSubField := match.Field[len(match.Field)-1]
-		msg += finalSubField
-
-		return models.MatchStatus{
-			Failed:         true,
-			Message:        fmt.Sprintf("field: '%s' doesn't exist", msg),
-			Failed_at_node: &node,
-		}
-	}
-
-	switch match.Type {
-	case models.TypeString:
-		_, valid := actual.(string)
-		if !valid {
-			return models.MatchStatus{
-				Failed:         true,
-				Message:        fmt.Sprintf("field: %s doesn't match expected type: %s", key, match.Type),
-				Failed_at_node: &node,
-			}
-		}
-	case models.TypeFloat:
-		_, valid := actual.(float64)
-		if !valid {
-			return models.MatchStatus{
-				Failed:         true,
-				Message:        fmt.Sprintf("field: %s doesn't match expected type: %s", key, match.Type),
-				Failed_at_node: &node,
-			}
-		}
-	case models.TypeBool:
-		_, valid := actual.(bool)
-		if !valid {
-			return models.MatchStatus{
-				Failed:         true,
-				Message:        fmt.Sprintf("field: %s with type: %T doesn't match expected type: %s", key, actual, match.Type),
-				Failed_at_node: &node,
-			}
-		}
-	case models.TypeArray:
-		_, valid := actual.([]interface{})
-		if !valid {
-			return models.MatchStatus{
-				Failed:         true,
-				Message:        fmt.Sprintf("field: %s with type: %T doesn't match expected type: %s", key, actual, match.Type),
-				Failed_at_node: &node,
-			}
-		}
-	case models.TypeObject:
-		_, valid := actual.(map[string]interface{})
-		if !valid {
-			return models.MatchStatus{
-				Failed:         true,
-				Message:        fmt.Sprintf("field: %s with type: %T doesn't match expected type: %s", key, actual, match.Type),
-				Failed_at_node: &node,
-			}
-		}
-
-	default:
-		panic("ERROR: user assigned type outside of the defined types in 'MatchType'")
-
-	}
-
-	return models.MatchStatus{
-		Failed:         false,
-		Failed_at_node: &node,
-		MatchedValue:   actual,
-		ValueType:      match.Type,
-	}
+	status := checkType(result, exist.Type, exist.Field)
+	status.Failed_at_node = &node
+	return status
 }
 
 func (match *Exist_Constraint) ToString() string {

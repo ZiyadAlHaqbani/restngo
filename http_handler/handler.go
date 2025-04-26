@@ -13,10 +13,9 @@ func Ptr[T any](t T) *T {
 }
 
 type HTTPResponse struct {
-	Status    int
-	Headers   http.Header
-	Body      map[string]interface{}
-	Tets_Body interface{} //	TODO: remove later, test for storing arbitrary json or list
+	Status  int
+	Headers http.Header
+	Body    interface{} //	TODO: remove later, test for storing arbitrary json or list
 }
 
 func tabs(tabs int) string {
@@ -78,21 +77,19 @@ func (resp *HTTPResponse) ToString() string {
 	temp = fmt.Sprintf("%s\n", temp)
 
 	temp = fmt.Sprintf("%s\n", temp)
-	for key, value := range resp.Body {
-		switch v := value.(type) {
-		case string:
-			temp = fmt.Sprintf("%s\n\t%s: %s", temp, key, v)
-		case float64:
-			temp = fmt.Sprintf("%s\n\t%s: %f", temp, key, v)
-		case bool:
-			temp = fmt.Sprintf("%s\n\t%s: %b", temp, key, v)
-		case []interface{}:
-			temp = resp.resolveInterfaceList(temp, key, v, 1)
-		case map[string]interface{}:
-			temp = resp.resolveInterfaceMap(temp, key, v, 1)
-		default:
-			temp = fmt.Sprintf("%s\n\t%s: unknown type", temp, key)
-		}
+	switch v := resp.Body.(type) {
+	case string:
+		temp = fmt.Sprintf("%s\n\t%s", temp, v)
+	case float64:
+		temp = fmt.Sprintf("%s\n\t%f", temp, v)
+	case bool:
+		temp = fmt.Sprintf("%s\n\t%b", temp, v)
+	case []interface{}:
+		temp = resp.resolveInterfaceList(temp, "", v, 1)
+	case map[string]interface{}:
+		temp = resp.resolveInterfaceMap(temp, "", v, 1)
+	default:
+		temp = fmt.Sprintf("%s\n\t%s: unknown type for object: %+v", temp, v)
 	}
 	temp = fmt.Sprintf("%s\n", temp)
 
@@ -122,23 +119,16 @@ func Handle(client *http.Client, request Request) (*HTTPResponse, error) {
 
 	resp_body_bytes, resp_err := io.ReadAll(resp.Body)
 
-	var body_json map[string]interface{}
-	if resp_err != nil {
-		return nil, fmt.Errorf("ERROR: failed to read the bytes from the response body %+v", resp_err)
-	}
-	json.Unmarshal(resp_body_bytes, &body_json)
-
-	var json_interface interface{}
+	var json_body interface{}
 	if resp_err != nil {
 		return nil, fmt.Errorf("ERROR: failed to read the bytes from the response body INTERFACE %+v", resp_err)
 	}
-	json.Unmarshal(resp_body_bytes, &json_interface)
+	json.Unmarshal(resp_body_bytes, &json_body)
 
 	return &HTTPResponse{
-			Status:    resp.StatusCode,
-			Headers:   resp.Request.Header,
-			Body:      body_json,
-			Tets_Body: json_interface,
+			Status:  resp.StatusCode,
+			Headers: resp.Request.Header,
+			Body:    json_body,
 		},
 		nil
 }
