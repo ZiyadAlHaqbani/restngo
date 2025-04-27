@@ -9,6 +9,7 @@ import (
 	"htestp/nodes"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func CreateNewBuilder() *TestBuilder {
@@ -24,14 +25,14 @@ func CreateNewBuilder() *TestBuilder {
 }
 
 type TestBuilder struct {
+	Nodes   *map[string]models.Node
 	head    models.Node
 	current models.Node
 	client  *http.Client
 	Storage *map[string]models.TypedVariable
 }
 
-// TODO: add AddStaticNodeRaw
-func (builder *TestBuilder) AddStaticNode(url string, method models.HTTPMethod, body *bytes.Buffer) *TestBuilder {
+func (builder *TestBuilder) AddStaticNodeId(id string, url string, method models.HTTPMethod, body *bytes.Buffer) *TestBuilder {
 
 	request := httphandler.Request{
 		Url:    url,
@@ -39,7 +40,7 @@ func (builder *TestBuilder) AddStaticNode(url string, method models.HTTPMethod, 
 	}
 
 	if body != nil {
-		request.Body = *body
+		request.Body = body
 	}
 
 	new := &nodes.StaticNode{Request: request}
@@ -48,19 +49,47 @@ func (builder *TestBuilder) AddStaticNode(url string, method models.HTTPMethod, 
 		builder.current = builder.head
 		return builder
 	}
+	(*builder.Nodes)[id] = new
 
 	builder.current.AddNode(new)
 	builder.current = new
+	return builder
+}
+func (builder *TestBuilder) AddStaticNode(url string, method models.HTTPMethod, body *bytes.Buffer) *TestBuilder {
+	id := strconv.Itoa(len(*builder.Nodes))
+	return builder.AddStaticNodeId(id, url, method, body)
 
+}
+func (builder *TestBuilder) AddStaticNodeRawId(id string, request httphandler.Request) *TestBuilder {
+
+	new := &nodes.StaticNode{Request: request}
+	if builder.head == nil {
+		builder.head = new
+		builder.current = builder.head
+		return builder
+	}
+	(*builder.Nodes)[id] = new
+
+	builder.current.AddNode(new)
+	builder.current = new
 	return builder
 }
 
-// TODO: add AddDynamicNodeRaw
-//
+func (builder *TestBuilder) AddStaticNodeRaw(request httphandler.Request) *TestBuilder {
+	id := strconv.Itoa(len(*builder.Nodes))
+	return builder.AddStaticNodeRawId(id, request)
+}
+
 //	dynamic nodes use data from the global context to build their own queries and bodies, must be noted that the query builder
 //	assumes your url does not include a query
-func (builder *TestBuilder) AddDynamicNode(url string, method models.HTTPMethod, queryBuilder func(*map[string]models.TypedVariable) map[string]string, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
+//
+// bodyBuilder callback can override given request body
 
+func (builder *TestBuilder) AddDynamicNode(url string, method models.HTTPMethod, queryBuilder func(*map[string]models.TypedVariable) map[string]string, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
+	id := strconv.Itoa(len(*builder.Nodes))
+	return builder.AddDynamicNodeId(id, url, method, queryBuilder, bodyBuilder)
+}
+func (builder *TestBuilder) AddDynamicNodeId(id string, url string, method models.HTTPMethod, queryBuilder func(*map[string]models.TypedVariable) map[string]string, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
 	new := &nodes.DynamicNode{
 		InnerNode: nodes.StaticNode{Request: httphandler.Request{
 			Url:    url,
@@ -70,7 +99,7 @@ func (builder *TestBuilder) AddDynamicNode(url string, method models.HTTPMethod,
 		BodyBuilderFunc:  bodyBuilder,
 		Storage:          builder.Storage,
 	}
-
+	(*builder.Nodes)[id] = new
 	if builder.head == nil {
 		builder.head = new
 		builder.current = builder.head
@@ -80,6 +109,29 @@ func (builder *TestBuilder) AddDynamicNode(url string, method models.HTTPMethod,
 	builder.current = new
 
 	return builder
+}
+func (builder *TestBuilder) AddDynamicNodeRawId(id string, request httphandler.Request, queryBuilder func(*map[string]models.TypedVariable) map[string]string, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
+
+	new := &nodes.DynamicNode{
+		InnerNode:        nodes.StaticNode{Request: request},
+		QueryBuilderFunc: queryBuilder,
+		BodyBuilderFunc:  bodyBuilder,
+		Storage:          builder.Storage,
+	}
+	(*builder.Nodes)[id] = new
+	if builder.head == nil {
+		builder.head = new
+		builder.current = builder.head
+		return builder
+	}
+	builder.current.AddNode(new)
+	builder.current = new
+
+	return builder
+}
+func (builder *TestBuilder) AddDynamicNodeRaw(request httphandler.Request, queryBuilder func(*map[string]models.TypedVariable) map[string]string, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
+	id := strconv.Itoa(len(*builder.Nodes))
+	return builder.AddDynamicNodeRawId(id, request, queryBuilder, bodyBuilder)
 }
 
 // WARNING: this is a dangerous function that shouldn't be used in most cases, it sets the current node of the caller
@@ -98,7 +150,7 @@ func (builder *TestBuilder) AddStaticNodeBranch(url string, method models.HTTPMe
 	}
 
 	if body != nil {
-		request.Body = *body
+		request.Body = body
 	}
 
 	new := nodes.StaticNode{

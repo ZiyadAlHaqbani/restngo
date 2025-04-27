@@ -101,7 +101,7 @@ func Handle(client *http.Client, request Request) (*HTTPResponse, error) {
 	var err error
 	var resp *http.Response
 
-	req, req_err := http.NewRequest(request.Method, request.Url, &request.Body)
+	req, req_err := http.NewRequest(request.Method, request.Url, request.Body)
 	if req_err != nil {
 		return nil, fmt.Errorf("ERROR: failed to create request: %+v\n\t%+v", request, req_err)
 	}
