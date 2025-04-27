@@ -107,3 +107,14 @@ builder.SetBranchTo(branch3)
 
 //program end
 ```
+
+
+
+## TODO
+
+ - [ ] Implement exists node
+ - [ ] reach 10% test coverage
+ - [ ] Design Conditional Node
+ - [ ] Integrate tracy profiler
+	 - [ ] Optimize Hotpath
+ - [ ]  DynamicNode TODO
