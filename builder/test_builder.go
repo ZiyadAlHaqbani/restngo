@@ -9,7 +9,6 @@ import (
 	"htestp/nodes"
 	"log"
 	"net/http"
-	"sync"
 )
 
 func CreateNewBuilder() *TestBuilder {
@@ -220,19 +219,26 @@ func (builder *TestBuilder) runHelper(node models.Node) bool {
 
 	// branches will still run even if a node in the level fails.
 	success := true
-	var success_mux sync.Mutex
-	var wg sync.WaitGroup
-	wg.Add(len(node.GetNextNodes()))
+	// var success_mux sync.Mutex
+	// var wg sync.WaitGroup
+	// wg.Add(len(node.GetNextNodes()))
+	// for _, nextNode := range node.GetNextNodes() {
+	// 	go func() {
+	// 		defer wg.Done()
+	// 		Successful := builder.runHelper(nextNode)
+	// 		if !Successful {
+	// 			success_mux.Lock()
+	// 			defer success_mux.Unlock()
+	// 			success = false
+	// 		}
+	// 	}()
+	// }
+
 	for _, nextNode := range node.GetNextNodes() {
-		go func() {
-			defer wg.Done()
-			Successful := builder.runHelper(nextNode)
-			if !Successful {
-				success_mux.Lock()
-				defer success_mux.Unlock()
-				success = false
-			}
-		}()
+		successful := builder.runHelper(nextNode)
+		if !successful {
+			success = false
+		}
 	}
 
 	return success
