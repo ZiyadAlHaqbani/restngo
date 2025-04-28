@@ -115,6 +115,6 @@ builder.SetBranchTo(branch3)
  - [ ] Implement exists node
  - [ ] reach 10% test coverage
  - [ ] Design Conditional Node
- - [ ] Integrate tracy profiler
+ - [ ] Integrate tracy profiler - Ziyad
 	 - [ ] Optimize Hotpath
  - [ ]  DynamicNode TODO
