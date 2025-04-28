@@ -4,6 +4,7 @@ import (
 	"fmt"
 	test_builder "htestp/builder"
 	"htestp/models"
+	"net/url"
 )
 
 func main() {
@@ -26,11 +27,11 @@ func main() {
 		"authorName",
 	).
 		AddDynamicNode("https://openlibrary.org/search.json", models.GET,
-			func(m *map[string]models.TypedVariable) map[string]string {
+			func(m *map[string]models.TypedVariable) url.Values {
 				key := (*m)["authorName"]
-				Map := map[string]string{}
-				Map["q"] = key.Value.(string)
-				return Map
+				params := url.Values{}
+				params.Set("q", key.Value.(string))
+				return params
 			}, nil).
 		AddExistConstraint("docs[2].author_key[0]", models.TypeString).
 		AddMatchStoreConstraint(
