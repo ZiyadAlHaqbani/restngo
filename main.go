@@ -11,7 +11,6 @@ func main() {
 	defer profilers.DumpTrace("trace.json")
 	defer profilers.ProfileScope("main")()
 
-	//start of the program
 	builder1 := test_builder.CreateNewBuilder()
 	builder1.
 		AddStaticNode(
