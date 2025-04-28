@@ -23,3 +23,6 @@
 
 !profiler
 !profiler/**
+
+!.github
+!.github/**
