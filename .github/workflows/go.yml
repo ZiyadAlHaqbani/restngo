@@ -5,9 +5,7 @@ name: Go
 
 on:
   push:
-    branches: [ $default-branch ]
   pull_request:
-    branches: [ $default-branch ]
 
 jobs:
 
@@ -26,4 +24,3 @@ jobs:
 
     - name: Test
       run: go test -v ./...
-      
