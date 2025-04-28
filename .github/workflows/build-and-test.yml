@@ -19,9 +19,9 @@ jobs:
                     check-latest: true
 
             -   name: Build
-                uses: go build -v .
+                run: go build -v ./...
             
             -   name: Test
-                uses: go test -v .
+                run: go test -v ./...
             
             
