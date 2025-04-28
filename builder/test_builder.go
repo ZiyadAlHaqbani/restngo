@@ -9,6 +9,7 @@ import (
 	"htestp/nodes"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 )
 
@@ -98,11 +99,11 @@ func (builder *TestBuilder) AddStaticNodeRaw(request httphandler.Request) *TestB
 //
 // bodyBuilder callback can override given request body
 
-func (builder *TestBuilder) AddDynamicNode(url string, method models.HTTPMethod, queryBuilder func(*map[string]models.TypedVariable) map[string]string, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
+func (builder *TestBuilder) AddDynamicNode(url string, method models.HTTPMethod, queryBuilder func(*map[string]models.TypedVariable) url.Values, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
 	id := strconv.Itoa(len(*builder.Nodes))
 	return builder.AddDynamicNodeId(id, url, method, queryBuilder, bodyBuilder)
 }
-func (builder *TestBuilder) AddDynamicNodeId(id string, url string, method models.HTTPMethod, queryBuilder func(*map[string]models.TypedVariable) map[string]string, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
+func (builder *TestBuilder) AddDynamicNodeId(id string, url string, method models.HTTPMethod, queryBuilder func(*map[string]models.TypedVariable) url.Values, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
 
 	if _, exists := (*builder.Nodes)[id]; exists {
 		log.Fatalf("ERROR: node with id : %q already exists!", id)
@@ -129,7 +130,7 @@ func (builder *TestBuilder) AddDynamicNodeId(id string, url string, method model
 
 	return builder
 }
-func (builder *TestBuilder) AddDynamicNodeRawId(id string, request httphandler.Request, queryBuilder func(*map[string]models.TypedVariable) map[string]string, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
+func (builder *TestBuilder) AddDynamicNodeRawId(id string, request httphandler.Request, queryBuilder func(*map[string]models.TypedVariable) url.Values, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
 
 	if _, exists := (*builder.Nodes)[id]; exists {
 		log.Fatalf("ERROR: node with id : %q already exists!", id)
@@ -153,7 +154,7 @@ func (builder *TestBuilder) AddDynamicNodeRawId(id string, request httphandler.R
 
 	return builder
 }
-func (builder *TestBuilder) AddDynamicNodeRaw(request httphandler.Request, queryBuilder func(*map[string]models.TypedVariable) map[string]string, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
+func (builder *TestBuilder) AddDynamicNodeRaw(request httphandler.Request, queryBuilder func(*map[string]models.TypedVariable) url.Values, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
 	id := strconv.Itoa(len(*builder.Nodes))
 	return builder.AddDynamicNodeRawId(id, request, queryBuilder, bodyBuilder)
 }

@@ -13,7 +13,7 @@ import (
 type DynamicNode struct {
 	InnerNode StaticNode
 	// TODO: Use url values instead of map[string]string
-	QueryBuilderFunc func(storage *map[string]models.TypedVariable) map[string]string
+	QueryBuilderFunc func(storage *map[string]models.TypedVariable) url.Values
 	BodyBuilderFunc  func(storage *map[string]models.TypedVariable) map[string]interface{}
 	Storage          *map[string]models.TypedVariable
 	Next             []models.Node
@@ -28,23 +28,23 @@ type DynamicNode struct {
 // ToString() string
 // Successful() bool
 
-func sanitizeQuery(query map[string]string) string {
-
-	//	e.g value = "My name is Ahmad" can't be included in url queries.
-	//	"My name is Ahmad" -> "My+name+is+Ahmad" can be included in url queries.
-	params := url.Values{}
-	for key, value := range query {
-		params.Add(key, value)
-	}
-	return params.Encode()
-}
+// DEPRECATED
+// func sanitizeQuery(query map[string]string) string {
+// 	//	e.g value = "My name is Ahmad" can't be included in url queries.
+// 	//	"My name is Ahmad" -> "My+name+is+Ahmad" can be included in url queries.
+// 	params := url.Values{}
+// 	for key, value := range query {
+// 		params.Add(key, value)
+// 	}
+// 	return params.Encode()
+// }
 
 func (node *DynamicNode) Execute(client *http.Client) (httphandler.HTTPResponse, error) {
 
 	if node.QueryBuilderFunc != nil {
 
 		params := node.QueryBuilderFunc(node.Storage)
-		request_params := sanitizeQuery(params)
+		request_params := params.Encode()
 		node.InnerNode.Request.Url += "?" + request_params
 	}
 
