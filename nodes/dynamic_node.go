@@ -6,7 +6,6 @@ import (
 	"fmt"
 	httphandler "htestp/http_handler"
 	"htestp/models"
-	profilers "htestp/profiler"
 	"net/http"
 	"net/url"
 )
@@ -14,7 +13,7 @@ import (
 type DynamicNode struct {
 	InnerNode StaticNode
 	// TODO: Use url values instead of map[string]string
-	QueryBuilderFunc func(storage *map[string]models.TypedVariable) map[string]string
+	QueryBuilderFunc func(storage *map[string]models.TypedVariable) url.Values
 	BodyBuilderFunc  func(storage *map[string]models.TypedVariable) map[string]interface{}
 	Storage          *map[string]models.TypedVariable
 	Next             []models.Node
@@ -29,23 +28,23 @@ type DynamicNode struct {
 // ToString() string
 // Successful() bool
 
-func sanitizeQuery(query map[string]string) string {
-	defer profilers.ProfileScope("sanitizeQuery")()
-	//	e.g value = "My name is Ahmad" can't be included in url queries.
-	//	"My name is Ahmad" -> "My+name+is+Ahmad" can be included in url queries.
-	params := url.Values{}
-	for key, value := range query {
-		params.Add(key, value)
-	}
-	return params.Encode()
-}
+// DEPRECATED
+// func sanitizeQuery(query map[string]string) string {
+// 	//	e.g value = "My name is Ahmad" can't be included in url queries.
+// 	//	"My name is Ahmad" -> "My+name+is+Ahmad" can be included in url queries.
+// 	params := url.Values{}
+// 	for key, value := range query {
+// 		params.Add(key, value)
+// 	}
+// 	return params.Encode()
+// }
 
 func (node *DynamicNode) Execute(client *http.Client) (httphandler.HTTPResponse, error) {
-	defer profilers.ProfileScope("DynamicNode::Execute")()
+
 	if node.QueryBuilderFunc != nil {
 
 		params := node.QueryBuilderFunc(node.Storage)
-		request_params := sanitizeQuery(params)
+		request_params := params.Encode()
 		node.InnerNode.Request.Url += "?" + request_params
 	}
 
@@ -64,38 +63,38 @@ func (node *DynamicNode) Execute(client *http.Client) (httphandler.HTTPResponse,
 }
 
 func (node *DynamicNode) Check() bool {
-	defer profilers.ProfileScope("DynamicNode::Check")()
+
 	return node.InnerNode.Check()
 }
 
 func (node *DynamicNode) GetResp() httphandler.HTTPResponse {
-	defer profilers.ProfileScope("DynamicNode::GetResp")()
+
 	return node.InnerNode.GetResp()
 }
 
 func (node *DynamicNode) AddConstraint(constraint models.Constraint) {
-	defer profilers.ProfileScope("DynamicNode::AddConstraint")()
+
 	node.InnerNode.AddConstraint(constraint)
 }
 
 func (node *DynamicNode) GetNextNodes() []models.Node {
-	defer profilers.ProfileScope("DynamicNode::GetNextNodes")()
+
 	return node.Next
 }
 
 func (node *DynamicNode) AddNode(new models.Node) {
-	defer profilers.ProfileScope("DynamicNode::AddNode")()
+
 	node.Next = append(node.Next, new)
 }
 
 func (node *DynamicNode) ToString() string {
-	defer profilers.ProfileScope("DynamicNode::ToString")()
+
 	temp := "Dynamic Node: "
 	temp = fmt.Sprintf("%s%s", temp, node.InnerNode.ToString())
 	return temp
 }
 
 func (node *DynamicNode) Successful() bool {
-	defer profilers.ProfileScope("DynamicNode::Successul")()
+
 	return node.InnerNode.Successful()
 }

@@ -7,9 +7,9 @@ import (
 	httphandler "htestp/http_handler"
 	"htestp/models"
 	"htestp/nodes"
-	profilers "htestp/profiler"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 )
 
@@ -99,11 +99,11 @@ func (builder *TestBuilder) AddStaticNodeRaw(request httphandler.Request) *TestB
 //
 // bodyBuilder callback can override given request body
 
-func (builder *TestBuilder) AddDynamicNode(url string, method models.HTTPMethod, queryBuilder func(*map[string]models.TypedVariable) map[string]string, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
+func (builder *TestBuilder) AddDynamicNode(url string, method models.HTTPMethod, queryBuilder func(*map[string]models.TypedVariable) url.Values, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
 	id := strconv.Itoa(len(*builder.Nodes))
 	return builder.AddDynamicNodeId(id, url, method, queryBuilder, bodyBuilder)
 }
-func (builder *TestBuilder) AddDynamicNodeId(id string, url string, method models.HTTPMethod, queryBuilder func(*map[string]models.TypedVariable) map[string]string, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
+func (builder *TestBuilder) AddDynamicNodeId(id string, url string, method models.HTTPMethod, queryBuilder func(*map[string]models.TypedVariable) url.Values, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
 
 	if _, exists := (*builder.Nodes)[id]; exists {
 		log.Fatalf("ERROR: node with id : %q already exists!", id)
@@ -130,7 +130,7 @@ func (builder *TestBuilder) AddDynamicNodeId(id string, url string, method model
 
 	return builder
 }
-func (builder *TestBuilder) AddDynamicNodeRawId(id string, request httphandler.Request, queryBuilder func(*map[string]models.TypedVariable) map[string]string, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
+func (builder *TestBuilder) AddDynamicNodeRawId(id string, request httphandler.Request, queryBuilder func(*map[string]models.TypedVariable) url.Values, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
 
 	if _, exists := (*builder.Nodes)[id]; exists {
 		log.Fatalf("ERROR: node with id : %q already exists!", id)
@@ -154,7 +154,7 @@ func (builder *TestBuilder) AddDynamicNodeRawId(id string, request httphandler.R
 
 	return builder
 }
-func (builder *TestBuilder) AddDynamicNodeRaw(request httphandler.Request, queryBuilder func(*map[string]models.TypedVariable) map[string]string, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
+func (builder *TestBuilder) AddDynamicNodeRaw(request httphandler.Request, queryBuilder func(*map[string]models.TypedVariable) url.Values, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
 	id := strconv.Itoa(len(*builder.Nodes))
 	return builder.AddDynamicNodeRawId(id, request, queryBuilder, bodyBuilder)
 }
@@ -246,11 +246,11 @@ func (builder *TestBuilder) AddExistStoreConstraint(field string, expectedType m
 }
 
 func (builder *TestBuilder) PrintList() {
-	defer profilers.ProfileScope("PrintList")()
+
 	builder.printListHelper(builder.head)
 }
 func (builder *TestBuilder) printListHelper(node models.Node) {
-	defer profilers.ProfileScope("printListHelper")()
+
 	type_str := ""
 	switch node.(type) {
 	case *nodes.StaticNode:
@@ -272,13 +272,13 @@ func (builder *TestBuilder) printListHelper(node models.Node) {
 }
 
 func (builder *TestBuilder) Run() bool {
-	defer profilers.ProfileScope("Run")()
+
 	node := builder.head
 	return builder.runHelper(node)
 
 }
 func (builder *TestBuilder) runHelper(node models.Node) bool {
-	defer profilers.ProfileScope("runHelper")()
+
 	if node == nil {
 		return true
 	}
