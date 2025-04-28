@@ -1,4 +1,4 @@
-name: test action
+name: build-test
 
 on:
     pull_request: 
@@ -19,9 +19,9 @@ jobs:
                     check-latest: true
 
             -   name: Build
-                uses: go build -v ./...
+                uses: go build -v .
             
             -   name: Test
-                uses: go test -v ./...
+                uses: go test -v .
             
             
