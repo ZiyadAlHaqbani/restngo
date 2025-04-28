@@ -1,9 +1,10 @@
 name: build-test
 
 on:
+    push:
+        branches: [ $default-branch ]
     pull_request: 
-        branches: 
-            - main
+        branches: [ $default-branch ]
 
 jobs:
     build-and-test:
