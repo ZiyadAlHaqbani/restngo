@@ -68,7 +68,7 @@ func (resp *HTTPResponse) resolveInterfaceMap(temp string, key string, Map map[s
 }
 
 func (resp *HTTPResponse) ToString() string {
-	defer profilers.ProfileScope("httphandler.ToString")()
+
 	temp := ""
 	temp = fmt.Sprintf("%s\n\tStatus: %d", temp, resp.Status)
 
@@ -99,7 +99,7 @@ func (resp *HTTPResponse) ToString() string {
 }
 
 func Handle(client *http.Client, request Request) (*HTTPResponse, error) {
-	defer profilers.ProfileScope("Handle")()
+
 	var err error
 	var resp *http.Response
 
@@ -114,12 +114,23 @@ func Handle(client *http.Client, request Request) (*HTTPResponse, error) {
 	if req_err != nil {
 		return nil, fmt.Errorf("ERROR: failed to create request: %+v\n\t%+v", request, req_err)
 	}
-	for range request.Retries + 1 {
-		resp, err = client.Do(req)
-		if err == nil {
-			break
+
+	{
+
+		for range request.Retries + 1 {
+			resp, err = client.Do(req)
+			if err == nil {
+				break
+			}
+		}
+		for range request.Retries + 1 {
+			resp, err = client.Do(req)
+			if err == nil {
+				break
+			}
 		}
 	}
+
 	if err != nil {
 		return nil, fmt.Errorf("ERROR: failed to get response after %d Retries: %+v\n\t%+v", request.Retries, request, err)
 	}

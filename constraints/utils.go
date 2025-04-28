@@ -3,14 +3,13 @@ package constraints
 import (
 	"fmt"
 	"htestp/models"
-	profilers "htestp/profiler"
 	"log"
 	"strconv"
 	"strings"
 )
 
 func matchLists(a []interface{}, b []interface{}) (bool, string) {
-	defer profilers.ProfileScope("matchLists")()
+
 	if len(a) != len(b) {
 		return false, fmt.Sprintf("expected list of length: %d but found list of length: %d", len(b), len(a))
 	}
@@ -68,7 +67,7 @@ func matchLists(a []interface{}, b []interface{}) (bool, string) {
 }
 
 func matchMaps(a map[string]interface{}, b map[string]interface{}) (bool, string) {
-	defer profilers.ProfileScope("matchMaps")()
+
 	if len(a) != len(b) {
 		return false, fmt.Sprintf("expected list of length: %d but found list of length: %d", len(b), len(a))
 	}
@@ -126,7 +125,7 @@ func matchMaps(a map[string]interface{}, b map[string]interface{}) (bool, string
 }
 
 func traverse(field string, obj interface{}) (interface{}, string) {
-	defer profilers.ProfileScope("traverse")()
+
 	var traversals []models.Traversal
 
 	traversals, found := parseJSONPath(field)
@@ -168,7 +167,7 @@ func traverse(field string, obj interface{}) (interface{}, string) {
 }
 
 func parseJSONPath(field string) (traversals []models.Traversal, found bool) {
-	defer profilers.ProfileScope("parseJSONPath")()
+
 	if len(field) == 0 {
 		found = false
 		return
@@ -258,7 +257,7 @@ func parseJSONPath(field string) (traversals []models.Traversal, found bool) {
 }
 
 func checkType(value interface{}, data_type models.MatchType, field string) models.MatchStatus {
-	defer profilers.ProfileScope("checkType")()
+
 	switch data_type {
 	case models.TypeString:
 		_, valid := value.(string)
