@@ -19,6 +19,7 @@ func CreateNewBuilder() *TestBuilder {
 		current: nil,
 		client:  http.DefaultClient,
 		Storage: &map[string]models.TypedVariable{},
+		Nodes:   &map[string]models.Node{},
 	}
 
 	return builder
@@ -41,6 +42,8 @@ func (builder *TestBuilder) AddStaticNodeId(id string, url string, method models
 
 	if body != nil {
 		request.Body = body
+	} else {
+		request.Body = nil
 	}
 
 	new := &nodes.StaticNode{Request: request}

@@ -17,7 +17,7 @@ func main() {
 			nil,
 		)
 
-	branch1 := builder1.AddStaticNodeBranch("https://openlibrary.org/search.json", models.GET, nil)
+	builder1.AddStaticNodeBranch("https://openlibrary.org/search.json", models.GET, nil)
 
 	builder1.AddMatchStoreConstraint(
 		"slideshow.author",
@@ -43,8 +43,8 @@ func main() {
 	//	the builder doesn't proceed to any branch and stays at current
 
 	//	WARNING: when running the test, you must always start from the root builder
-	status := builder.Run()
+	status := builder1.Run()
 	fmt.Printf("Test Passed: %v", status)
-	builder.PrintList()
+	builder1.PrintList()
 	//program end
 }

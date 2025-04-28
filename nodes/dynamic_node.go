@@ -55,7 +55,7 @@ func (node *DynamicNode) Execute(client *http.Client) (httphandler.HTTPResponse,
 		}
 
 		request_body := bytes.NewBuffer(byteArray)
-		node.InnerNode.Request.Body = *request_body
+		node.InnerNode.Request.Body = request_body
 	}
 
 	return node.InnerNode.Execute(client)
