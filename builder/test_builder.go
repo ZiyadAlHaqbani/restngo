@@ -7,6 +7,7 @@ import (
 	httphandler "htestp/http_handler"
 	"htestp/models"
 	"htestp/nodes"
+	profilers "htestp/profiler"
 	"log"
 	"net/http"
 	"strconv"
@@ -245,10 +246,11 @@ func (builder *TestBuilder) AddExistStoreConstraint(field string, expectedType m
 }
 
 func (builder *TestBuilder) PrintList() {
+	defer profilers.ProfileScope("PrintList")()
 	builder.printListHelper(builder.head)
 }
 func (builder *TestBuilder) printListHelper(node models.Node) {
-
+	defer profilers.ProfileScope("printListHelper")()
 	type_str := ""
 	switch node.(type) {
 	case *nodes.StaticNode:
@@ -270,12 +272,13 @@ func (builder *TestBuilder) printListHelper(node models.Node) {
 }
 
 func (builder *TestBuilder) Run() bool {
+	defer profilers.ProfileScope("Run")()
 	node := builder.head
 	return builder.runHelper(node)
 
 }
 func (builder *TestBuilder) runHelper(node models.Node) bool {
-
+	defer profilers.ProfileScope("runHelper")()
 	if node == nil {
 		return true
 	}
@@ -295,20 +298,6 @@ func (builder *TestBuilder) runHelper(node models.Node) bool {
 
 	// branches will still run even if a node in the level fails.
 	success := true
-	// var success_mux sync.Mutex
-	// var wg sync.WaitGroup
-	// wg.Add(len(node.GetNextNodes()))
-	// for _, nextNode := range node.GetNextNodes() {
-	// 	go func() {
-	// 		defer wg.Done()
-	// 		Successful := builder.runHelper(nextNode)
-	// 		if !Successful {
-	// 			success_mux.Lock()
-	// 			defer success_mux.Unlock()
-	// 			success = false
-	// 		}
-	// 	}()
-	// }
 
 	for _, nextNode := range node.GetNextNodes() {
 		successful := builder.runHelper(nextNode)

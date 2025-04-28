@@ -3,6 +3,7 @@ package httphandler
 import (
 	"encoding/json"
 	"fmt"
+	profilers "htestp/profiler"
 	"io"
 	"net/http"
 	"strconv"
@@ -67,6 +68,7 @@ func (resp *HTTPResponse) resolveInterfaceMap(temp string, key string, Map map[s
 }
 
 func (resp *HTTPResponse) ToString() string {
+	defer profilers.ProfileScope("httphandler.ToString")()
 	temp := ""
 	temp = fmt.Sprintf("%s\n\tStatus: %d", temp, resp.Status)
 
@@ -97,7 +99,7 @@ func (resp *HTTPResponse) ToString() string {
 }
 
 func Handle(client *http.Client, request Request) (*HTTPResponse, error) {
-
+	defer profilers.ProfileScope("Handle")()
 	var err error
 	var resp *http.Response
 
@@ -130,7 +132,11 @@ func Handle(client *http.Client, request Request) (*HTTPResponse, error) {
 	if resp_err != nil {
 		return nil, fmt.Errorf("ERROR: failed to read the bytes from the response body INTERFACE %+v", resp_err)
 	}
-	json.Unmarshal(resp_body_bytes, &json_body)
+
+	{
+		defer profilers.ProfileScope("httphandler.Handle() unmarshalling responses")()
+		json.Unmarshal(resp_body_bytes, &json_body)
+	}
 
 	return &HTTPResponse{
 			Status:  resp.StatusCode,

@@ -1,6 +1,9 @@
 package constraints
 
-import "htestp/models"
+import (
+	"htestp/models"
+	profilers "htestp/profiler"
+)
 
 type Match_Store_Constraint struct {
 	InnerConstraint Match_Constraint
@@ -9,6 +12,7 @@ type Match_Store_Constraint struct {
 }
 
 func (match *Match_Store_Constraint) Constrain(node models.Node) models.MatchStatus {
+	defer profilers.ProfileScope("Match_Store_Constraint::Constrain")()
 	status := match.InnerConstraint.Constrain(node)
 	if !status.Failed {
 		(*match.Storage)[match.Varname] = models.TypedVariable{
@@ -20,5 +24,6 @@ func (match *Match_Store_Constraint) Constrain(node models.Node) models.MatchSta
 }
 
 func (match *Match_Store_Constraint) ToString() string {
+	defer profilers.ProfileScope("Match_Store_Constraint::ToString")()
 	return "str_" + match.InnerConstraint.ToString()
 }

@@ -2,6 +2,7 @@ package constraints
 
 import (
 	"htestp/models"
+	profilers "htestp/profiler"
 )
 
 type Exist_Constraint struct {
@@ -17,12 +18,14 @@ type Exist_Constraint struct {
 //		return status
 //	}
 func (exist *Exist_Constraint) Constrain(node models.Node) models.MatchStatus {
+	defer profilers.ProfileScope("Exist_Constraint::Constrain")()
 	status := exist.constrain(node)
 	exist.Status = status
 	return status
 }
 
 func (exist *Exist_Constraint) constrain(node models.Node) models.MatchStatus {
+	defer profilers.ProfileScope("Exist_Constraint::constrain")()
 	resp := node.GetResp()
 
 	result, msg := traverse(exist.Field, resp.Body)
@@ -38,5 +41,6 @@ func (exist *Exist_Constraint) constrain(node models.Node) models.MatchStatus {
 }
 
 func (match *Exist_Constraint) ToString() string {
+	defer profilers.ProfileScope("Exist_Constraint::ToString")()
 	return "exst_cnstr_" + match.Status.ToString()
 }
