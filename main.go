@@ -9,7 +9,6 @@ import (
 
 func main() {
 
-	//start of the program
 	builder1 := test_builder.CreateNewBuilder()
 	builder1.
 		AddStaticNode(
