@@ -108,6 +108,7 @@ builder.SetBranchTo(branch3)
 //program end
 ```
 
+[![Go](https://github.com/ZiyadHQ/H_TesT_P/actions/workflows/go.yml/badge.svg?branch=main&event=check_suite)](https://github.com/ZiyadHQ/H_TesT_P/actions/workflows/go.yml)
 
 
 ## TODO
