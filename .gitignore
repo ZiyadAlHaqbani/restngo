@@ -26,3 +26,5 @@
 
 !.github
 !.github/**
+
+!go.sum
