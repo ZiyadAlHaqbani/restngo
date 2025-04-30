@@ -167,7 +167,7 @@ func (builder *TestBuilder) SetBranchTo(callee *TestBuilder) {
 }
 
 func (builder *TestBuilder) AddStaticNodeBranch(url string, method models.HTTPMethod, body *bytes.Buffer) *TestBuilder {
-
+	// TODO: Check if current exists
 	//	construct the new static node
 	request := httphandler.Request{
 		Url:    url,
@@ -177,15 +177,13 @@ func (builder *TestBuilder) AddStaticNodeBranch(url string, method models.HTTPMe
 	if body != nil {
 		request.Body = body
 	}
-
-	new := nodes.StaticNode{
+	var new = nodes.StaticNode{
 		Request: request,
 	}
 
 	//	add the new node to the existing node tree
 	//	but don't proceed to the next node
 	builder.current.AddNode(&new)
-
 	//	TODO: look into making the head the same , or add a new flag to determine if the builder is a branch
 	//	TODO: builder to fix issues with using .Run() on a branch builder
 	//	construct the new branch builder, this builder build on the existing tree but it starts from the new branch
@@ -251,15 +249,7 @@ func (builder *TestBuilder) PrintList() {
 }
 func (builder *TestBuilder) printListHelper(node models.Node) {
 
-	type_str := ""
-	switch node.(type) {
-	case *nodes.StaticNode:
-		type_str = "Static_Node"
-	case *nodes.DynamicNode:
-		type_str = "Dynamic_Node"
-	}
-
-	fmt.Printf("\n\t%s: %+v\n", type_str, node.ToString())
+	fmt.Printf("\n\t%+v\n", node.ToString())
 	fmt.Printf("\t")
 
 	if node == nil || !node.Successful() {

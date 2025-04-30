@@ -88,13 +88,12 @@ func (node *DynamicNode) AddNode(new models.Node) {
 }
 
 func (node *DynamicNode) ToString() string {
-
 	temp := "Dynamic Node: "
 	temp = fmt.Sprintf("%s%s", temp, node.InnerNode.ToString())
 	return temp
 }
 
 func (node *DynamicNode) Successful() bool {
-
+	// Returns the opposite of flag failed
 	return node.InnerNode.Successful()
 }
