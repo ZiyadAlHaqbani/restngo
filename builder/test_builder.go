@@ -197,6 +197,30 @@ func (builder *TestBuilder) AddStaticNodeBranch(url string, method models.HTTPMe
 	return &branchBuilder
 }
 
+func (builder *TestBuilder) AddDynamicNodeBranch(url string, method models.HTTPMethod, queryBuilder func(*map[string]models.TypedVariable) url.Values, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
+	request := httphandler.Request{
+		Url:    url,
+		Method: string(method),
+	}
+	new := &nodes.DynamicNode{
+		InnerNode: nodes.StaticNode{
+			Request: request,
+		},
+		QueryBuilderFunc: queryBuilder,
+		BodyBuilderFunc:  bodyBuilder,
+		Storage:          builder.Storage,
+	}
+	builder.current.AddNode(new)
+	branchBuilder := TestBuilder{
+		head:    new,
+		current: new,
+		client:  builder.client,
+		Storage: builder.Storage,
+		Nodes:   builder.Nodes,
+	}
+	return &branchBuilder
+}
+
 func (builder *TestBuilder) AddMatchConstraint(field string, expectedValue interface{}, expectedType models.MatchType) *TestBuilder {
 	constraint := constraints.Match_Constraint{
 		Field:    field,
