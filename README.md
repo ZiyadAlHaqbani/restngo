@@ -109,13 +109,3 @@ builder.SetBranchTo(branch3)
 ```
 
 [![Go](https://github.com/ZiyadHQ/H_TesT_P/actions/workflows/go.yml/badge.svg?branch=main&event=check_suite)](https://github.com/ZiyadHQ/H_TesT_P/actions/workflows/go.yml)
-
-
-## TODO
-
- - [ ] Implement exists node
- - [ ] reach 10% test coverage
- - [ ] Design Conditional Node
- - [ ] Integrate tracy profiler - Ziyad
-	 - [ ] Optimize Hotpath
- - [ ]  DynamicNode TODO
