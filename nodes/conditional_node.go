@@ -1,61 +1,67 @@
 package nodes
 
 import (
-	"fmt"
 	httphandler "htestp/http_handler"
 	"htestp/models"
-	"log"
 	"net/http"
 )
 
+// TODO:	add a way to create node objects that don't contain constraints
+// TODO:	find a way to integrate this node into test_builder, most
+// TODO:	likely through a seperate conditionalNodeBuilder?
 type ConditionalNode struct {
-	FirstPathSucceeded  bool
-	SecondPathSucceeded bool
+	TrueNode  models.Node //	if the callback return true, this node will run.
+	FalseNode models.Node //	if the callback return false, this node will run.
 
-	FirstBranchNode  models.Node //	if the first path succeeds, then GetNextNodes will return this node.
-	SecondBranchNode models.Node //	if the second path succeeds, then GetNextNodes will return this node.
+	ConditionFunc func(map[string]models.TypedVariable) bool //	callback that determines which node will be run,
+	branch        bool                                       //	whether the callback returns true or false
+	Storage       *map[string]models.TypedVariable           //	global context
 
-	// Next        []models.Node
-	// Request     httphandler.Request
-	// Response    httphandler.HTTPResponse
-	// Constraints []models.Constraint
-	// Failed      bool
-
+	Next        []models.Node
+	Constraints []models.Constraint
+	Failed      bool
 }
 
 func (node *ConditionalNode) Execute(client *http.Client) (httphandler.HTTPResponse, error) {
+	panic("TODO: fully implement the conditional node, including adding constraints to children at runtime")
+	node.branch = node.ConditionFunc(*node.Storage)
 
-	//	execute the first path
-	resp_1, err_1 := node.FirstBranchNode.Execute()
-	if err_1 == nil {
-		return resp_1, nil
+	if node.branch {
+		return node.TrueNode.Execute(client)
+	} else {
+		return node.FalseNode.Execute(client)
 	}
-
-	log.Printf("DEBUG: first branch of conditional node failed: %+v", err_1)
-
-	//	execute the second path
-	resp_2, err_2 := node.FirstBranchNode.Execute()
-	if err_2 == nil {
-		return resp_2, nil
-	}
-
-	return httphandler.HTTPResponse{}, err_2
 }
 
 func (node *ConditionalNode) Check() bool {
+
+	var desiredNode models.Node
+	if node.branch {
+		desiredNode = node.TrueNode
+	} else {
+		desiredNode = node.FalseNode
+	}
+
+	//	to avoid duplicate assignment of constraints, we assign constraint after checking condition
+
 	var status models.MatchStatus
 	for _, constraint := range node.Constraints {
-		status = constraint.Constrain(node)
+		status = constraint.Constrain(desiredNode)
 		if status.Failed {
 			node.Failed = true
 		}
+
 	}
 	return !node.Failed
 
 }
 
 func (node *ConditionalNode) GetResp() httphandler.HTTPResponse {
-	return node.Response
+	if node.branch {
+		return node.TrueNode.GetResp()
+	} else {
+		return node.FalseNode.GetResp()
+	}
 }
 
 func (node *ConditionalNode) AddConstraint(constraint models.Constraint) {
@@ -67,40 +73,22 @@ func (node *ConditionalNode) AddNode(new models.Node) {
 }
 
 func (node *ConditionalNode) GetNextNodes() []models.Node {
-	if node.FirstPathSucceeded {
-		return []models.Node{node.FirstBranchNode}
-	} else if node.SecondPathSucceeded {
-		return []models.Node{node.SecondBranchNode}
-	}
-
-	return []models.Node{node.FirstBranchNode}
+	return node.Next
 }
 
 func (node *ConditionalNode) ToString() string {
-	temp := fmt.Sprintf("%s_%s", node.Request.Method, node.Request.Url)
 
-	if len(node.Constraints) > 0 {
-		temp += " {"
-		for _, constr := range node.Constraints {
-			temp += constr.ToString() + ", "
-		}
-		temp += "}"
+	temp := "ConditionalNode:"
+
+	if node.branch {
+		temp = "\n\t" + node.TrueNode.ToString()
+	} else {
+		temp = "\n\t" + node.FalseNode.ToString()
 	}
-	// resp := node.GetResp()
-	// temp = fmt.Sprintf("%s\n%s", temp, resp.ToString())
 
 	return temp
 }
 
 func (node *ConditionalNode) Successful() bool {
-	return (node.FirstBranchNode.Successful() && node.SecondBranchNode.Successful())
+	return node.Failed
 }
-
-// Execute(client *http.Client) (httphandler.HTTPResponse, error)
-// Check() bool
-// GetResp() httphandler.HTTPResponse
-// AddConstraint(Constraint)
-// AddNode(Node)
-// GetNextNodes() []Node
-// ToString() string
-// Successful() bool
