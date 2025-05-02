@@ -39,6 +39,18 @@ func main() {
 			models.TypeString,
 			"authorKey")
 
+	builder1.AddDynamicNodeBranch(
+		"https://httpbin.org/get",
+		models.GET,
+		func(m *map[string]models.TypedVariable) url.Values {
+			authorKey := (*m)["authorKey"]
+			params := url.Values{}
+			params.Set("author_key", authorKey.Value.(string))
+			return params
+		},
+		nil,
+	).AddExistConstraint("args.author_key", models.TypeString)
+
 	//	each operation builds a new branch, with the parent being the previous builder's current branch
 	//	the builder doesn't proceed to any branch and stays at current
 
