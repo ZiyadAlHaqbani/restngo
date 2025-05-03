@@ -5,6 +5,8 @@
 !go.mod
 !docs.excalidraw.png
 !README.md
+!LICENSE
+!go.sum
 
 !constraints
 !constraints/**
@@ -26,5 +28,3 @@
 
 !.github
 !.github/**
-
-!go.sum
