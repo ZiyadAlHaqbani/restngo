@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"htestp/DSL/parser"
+	"htestp/DSL/scanner"
 )
 
 func main() {
@@ -14,11 +14,11 @@ StaticNode("https://github.com", GET, ExistConstraint(),
 )
 		`
 
-	scanner := parser.CreateScanner(source)
+	scanner := scanner.CreateScanner(source)
 	scanner.Scan()
 
 	fmt.Printf("%s", scanner.ToString())
-	testScanner := parser.CreateScanner(scanner.ToString())
+	testScanner := scanner.CreateScanner(scanner.ToString())
 	testScanner.Scan()
 	fmt.Printf("%+v", testScanner.ToString() == scanner.ToString())
 	//program end
