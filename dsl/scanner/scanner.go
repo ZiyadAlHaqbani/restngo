@@ -32,7 +32,7 @@ func (scanner *Scanner) Scan() {
 		scanner.scanToken()
 
 	}
-
+	scanner.addToken(EOF)
 }
 
 func (scanner *Scanner) scanToken() {
@@ -62,7 +62,7 @@ func (scanner *Scanner) scanToken() {
 
 	default:
 		if isDigit(scanner.peek()) {
-
+			scanner.number()
 		} else if isAlpha(scanner.peek()) {
 			scanner.identifier()
 		}
@@ -143,14 +143,32 @@ func (scanner *Scanner) identifier() {
 		scanner.advance()
 	}
 
-	tok := scanner.addToken(0) //temporary token type
+	tok := Token{
+		Content: scanner.source[scanner.start:scanner.current],
+		Type:    0,
+		Line:    scanner.line,
+	}
 
 	if scanner.eof() {
 		log.Fatalf("ERROR: string literals must end with a '\"', at: %+v", tok)
 	}
 
-	tok.Type = TypesMap[tok.Content]
+	tokType, exists := TypesMap[tok.Content]
+	if !exists {
+		log.Fatalf("ERROR: unrecognized literal: %q at: %+v", tok.Content, tok)
+	}
 
+	tok.Type = tokType
+
+	scanner.addTokenRaw(tok)
+}
+
+func (scanner *Scanner) number() {
+	for isDigit(scanner.peek()) {
+		scanner.advance()
+	}
+
+	scanner.addToken(Number)
 }
 
 func (scanner *Scanner) eof() bool {
@@ -166,6 +184,13 @@ func (scanner *Scanner) addToken(Type TokenType) Token {
 	scanner.tokens = append(scanner.tokens, token)
 
 	return token
+}
+
+func (scanner *Scanner) addTokenRaw(tok Token) Token {
+
+	scanner.tokens = append(scanner.tokens, tok)
+
+	return tok
 }
 
 func (scanner *Scanner) ToString() string {

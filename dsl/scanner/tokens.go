@@ -1,22 +1,30 @@
 package scanner
 
+import "htestp/models"
+
 type TokenType int
 
 const (
-	INVALID TokenType = iota
+	EOF TokenType = iota
 	Comma
 	LeftParen
 	RightParen
 
+	//	Value wrappers
 	Number
 	StringLiteral
-	DataType
 
-	StaticNode
-	//TODO: support other node types
+	//	Data types
+	Float64
+	BOOL
+	STRING
+	ARRAY
+	OBJECT
 
-	ExistConstraint
-	//TODO: support other constraint types
+	Identifier //TODO: remove the below types, as identifier is handled by the parser
+
+	Node
+	Constraint
 
 	URL
 	METHOD
@@ -24,11 +32,34 @@ const (
 
 // Map strings to specific token types
 var TypesMap = map[string]TokenType{
-	"StaticNode":      StaticNode,
-	"ExistConstraint": ExistConstraint,
-	"GET":             METHOD,
-	"POST":            METHOD,
-	"PUT":             METHOD,
+	"StaticNode":      Node,
+	"DynamicNode":     Node,
+	"ConditionalNode": Node,
+
+	"ExistConstraint":      Constraint,
+	"ExistStoreConstraint": Constraint,
+	"MatchConstraint":      Constraint,
+	"MatchStoreConstraint": Constraint,
+
+	"Float64": Float64,
+	"BOOL":    BOOL,
+	"STRING":  STRING,
+	"ARRAY":   ARRAY,
+	"OBJECT":  OBJECT,
+
+	"GET":  METHOD,
+	"POST": METHOD,
+	"PUT":  METHOD,
+}
+
+// Map TokenTypes to specific type enums
+var DataTypesMap = map[TokenType]models.MatchType{
+
+	Float64: models.TypeFloat,
+	BOOL:    models.TypeBool,
+	STRING:  models.TypeString,
+	ARRAY:   models.TypeArray,
+	OBJECT:  models.TypeObject,
 }
 
 type Token struct {
