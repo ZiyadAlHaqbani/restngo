@@ -18,7 +18,7 @@ StaticNode("https://github.com", GET, ExistConstraint(),
 	s.Scan()
 
 	fmt.Printf("%s", s.ToString())
-	testScanner := scanner.CreateScanner()
+	testScanner := scanner.CreateScanner(s.ToString())
 	fmt.Printf("%+v", testScanner.ToString() == s.ToString())
 	//program end
 }
