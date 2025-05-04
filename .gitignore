@@ -5,6 +5,8 @@
 !go.mod
 !docs.excalidraw.png
 !README.md
+!LICENSE
+!go.sum
 
 !constraints
 !constraints/**
@@ -30,4 +32,3 @@
 !dsl
 !dsl/**
 
-!go.sum
