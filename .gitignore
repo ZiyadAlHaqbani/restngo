@@ -27,7 +27,7 @@
 !.github
 !.github/**
 
-!DLS
-!DSL/**
+!dsl
+!dsl/**
 
 !go.sum
