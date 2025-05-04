@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"htestp/DSL/scanner"
+	"htestp/dsl/scanner"
 )
 
 func main() {
