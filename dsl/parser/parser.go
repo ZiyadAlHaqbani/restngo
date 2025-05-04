@@ -50,10 +50,15 @@ func (parser *Parser) consume(t scanner.TokenType) scanner.Token {
 
 func (parser *Parser) parse() models.Node {
 	parser.parseExpression()
+
+	//_
+	return &nodes.ConditionalNode{}
 }
 
 func (parser *Parser) parseExpression() models.Node {
 	parser.parseFunction()
+	//_
+	return &nodes.ConditionalNode{}
 }
 
 func (parser *Parser) parseFunction() models.Node {
@@ -64,6 +69,8 @@ func (parser *Parser) parseFunction() models.Node {
 	}
 
 	log.Fatalf("ERROR: unrecognized identifier: %+v", parser.peek())
+	//_
+	return &nodes.ConditionalNode{}
 }
 
 func (parser *Parser) parseNode() models.Node {
@@ -80,6 +87,7 @@ func (parser *Parser) parseNode() models.Node {
 	}
 
 	log.Fatal("ERROR: check code!")
+	//_
 	return &nodes.ConditionalNode{}
 }
 
@@ -109,6 +117,8 @@ func (parser *Parser) parseStaticNode() models.Node {
 
 	staticNode.Constraints = constraints
 
+	//_
+	return &nodes.ConditionalNode{}
 }
 
 func (parser *Parser) parseConstraints() []models.Constraint {
@@ -116,7 +126,7 @@ func (parser *Parser) parseConstraints() []models.Constraint {
 
 	for parser.check(scanner.Constraint) {
 
-		constraints = append(constraints, parseConstraint())
+		// constraints = append(constraints, parseConstraint())
 	}
 
 	return constraints
@@ -132,7 +142,7 @@ func (parser *Parser) parseConstraint() models.Constraint {
 
 	expected, exists := scanner.DataTypesMap[parser.advance().Type]
 	if !exists {
-
+		log.Fatalf("ERROR: ")
 	}
 
 	switch identifier.Content {
@@ -144,4 +154,5 @@ func (parser *Parser) parseConstraint() models.Constraint {
 	}
 
 	log.Fatalf("ERROR: couldn't parse constraint for token sequence starting at: %+v", identifier)
+	return nil
 }
