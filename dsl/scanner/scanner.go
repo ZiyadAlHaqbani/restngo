@@ -24,7 +24,7 @@ type Scanner struct {
 	tokens []Token
 }
 
-func (scanner *Scanner) Scan() {
+func (scanner *Scanner) Scan() []Token {
 
 	for !scanner.eof() {
 		scanner.start = scanner.current
@@ -33,6 +33,8 @@ func (scanner *Scanner) Scan() {
 
 	}
 	scanner.addToken(EOF)
+
+	return scanner.tokens
 }
 
 func (scanner *Scanner) scanToken() {
@@ -179,6 +181,7 @@ func (scanner *Scanner) addToken(Type TokenType) Token {
 	token := Token{
 		Content: scanner.source[scanner.start:scanner.current],
 		Type:    Type,
+		Start:   scanner.current,
 		Line:    scanner.line,
 	}
 	scanner.tokens = append(scanner.tokens, token)

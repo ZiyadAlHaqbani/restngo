@@ -10,6 +10,12 @@ import (
 	"slices"
 )
 
+func CreateParser(tokens []scanner.Token) *Parser {
+	return &Parser{
+		tokens: tokens,
+	}
+}
+
 type Parser struct {
 	tokens  []scanner.Token
 	current int
@@ -44,26 +50,23 @@ func (parser *Parser) consume(t scanner.TokenType) scanner.Token {
 	if parser.peek().Type == t {
 		return parser.advance()
 	}
-	log.Fatalf("ERROR: expected %+v, but found: '%+v'", t, parser.peek())
+	log.Fatalf("ERROR: expected %s, but found: '%s'", scanner.TokenTypeToString[t], parser.peek().ToString())
 	return scanner.Token{}
 }
 
-func (parser *Parser) parse() models.Node {
-	parser.parseExpression()
-
-	//_
-	return &nodes.ConditionalNode{}
+func (parser *Parser) Parse() {
+	parser.head = parser.parseExpression()
 }
 
 func (parser *Parser) parseExpression() models.Node {
-	parser.parseFunction()
+	return parser.parseFunction()
 	//_
 	return &nodes.ConditionalNode{}
 }
 
 func (parser *Parser) parseFunction() models.Node {
 	if scanner.TypesMap[parser.peek().Content] == scanner.Node {
-		parser.parseNode()
+		return parser.parseNode()
 	} else if scanner.TypesMap[parser.peek().Content] == scanner.Constraint {
 		log.Fatal("ERROR: constraints must only be defined within nodes, and not outside of them")
 	}
@@ -80,7 +83,7 @@ func (parser *Parser) parseNode() models.Node {
 	case "StaticNode":
 		return parser.parseStaticNode()
 	case "DynamicNode":
-		log.Fatal("ERROR: DynamicNode is not supported.")
+		log.Fatal("ERROR: DynamicNode is not supported yet.")
 	default:
 		log.Fatalf("ERROR: unsupported node type: %q, at: %+v", id.Content, id)
 
@@ -117,16 +120,21 @@ func (parser *Parser) parseStaticNode() models.Node {
 
 	staticNode.Constraints = constraints
 
+	parser.parseNode() //FDFDFSDFSD
+
 	//_
-	return &nodes.ConditionalNode{}
+	return &staticNode
 }
 
 func (parser *Parser) parseConstraints() []models.Constraint {
 	var constraints []models.Constraint
 
 	for parser.check(scanner.Constraint) {
-
-		// constraints = append(constraints, parseConstraint())
+		new := parser.parseConstraint()
+		if new == nil {
+			break
+		}
+		constraints = append(constraints, new)
 	}
 
 	return constraints
@@ -142,7 +150,7 @@ func (parser *Parser) parseConstraint() models.Constraint {
 
 	expected, exists := scanner.DataTypesMap[parser.advance().Type]
 	if !exists {
-		log.Fatalf("ERROR: ")
+		log.Fatalf("ERROR: unrecognized type: %v", parser.advance().Type)
 	}
 
 	switch identifier.Content {
@@ -151,6 +159,9 @@ func (parser *Parser) parseConstraint() models.Constraint {
 			Field: field.Content,
 			Type:  expected,
 		}
+	}
+	if !parser.match(scanner.Comma) {
+		return nil
 	}
 
 	log.Fatalf("ERROR: couldn't parse constraint for token sequence starting at: %+v", identifier)
