@@ -7,6 +7,7 @@ import (
 	httphandler "htestp/http_handler"
 	"htestp/models"
 	"htestp/nodes"
+	"htestp/runner"
 	"log"
 	"net/http"
 	"net/url"
@@ -19,7 +20,6 @@ func CreateNewBuilder() *TestBuilder {
 		head:    nil,
 		current: nil,
 		client:  http.DefaultClient,
-		Storage: &map[string]models.TypedVariable{},
 		Nodes:   &map[string]models.Node{},
 	}
 
@@ -31,7 +31,6 @@ type TestBuilder struct {
 	head    models.Node
 	current models.Node
 	client  *http.Client
-	Storage *map[string]models.TypedVariable
 }
 
 func (builder *TestBuilder) AddStaticNodeId(id string, url string, method models.HTTPMethod, body *bytes.Buffer) *TestBuilder {
@@ -117,7 +116,6 @@ func (builder *TestBuilder) AddDynamicNodeId(id string, url string, method model
 		}},
 		QueryBuilderFunc: queryBuilder,
 		BodyBuilderFunc:  bodyBuilder,
-		Storage:          builder.Storage,
 	}
 	(*builder.Nodes)[id] = new
 	if builder.head == nil {
@@ -141,7 +139,6 @@ func (builder *TestBuilder) AddDynamicNodeRawId(id string, request httphandler.R
 		InnerNode:        nodes.StaticNode{Request: request},
 		QueryBuilderFunc: queryBuilder,
 		BodyBuilderFunc:  bodyBuilder,
-		Storage:          builder.Storage,
 	}
 	(*builder.Nodes)[id] = new
 	if builder.head == nil {
@@ -191,7 +188,6 @@ func (builder *TestBuilder) AddStaticNodeBranch(url string, method models.HTTPMe
 		head:    &new,
 		current: &new,
 		client:  builder.client,
-		Storage: builder.Storage,
 	}
 
 	return &branchBuilder
@@ -208,14 +204,12 @@ func (builder *TestBuilder) AddDynamicNodeBranch(url string, method models.HTTPM
 		},
 		QueryBuilderFunc: queryBuilder,
 		BodyBuilderFunc:  bodyBuilder,
-		Storage:          builder.Storage,
 	}
 	builder.current.AddNode(new)
 	branchBuilder := TestBuilder{
 		head:    new,
 		current: new,
 		client:  builder.client,
-		Storage: builder.Storage,
 		Nodes:   builder.Nodes,
 	}
 	return &branchBuilder
@@ -238,7 +232,6 @@ func (builder *TestBuilder) AddMatchStoreConstraint(field string, expectedValue 
 			Type:     expectedType,
 			Expected: expectedValue,
 		},
-		Storage: builder.Storage,
 		Varname: varname,
 	}
 	builder.current.AddConstraint(&constraint)
@@ -260,7 +253,6 @@ func (builder *TestBuilder) AddExistStoreConstraint(field string, expectedType m
 			Field: field,
 			Type:  expectedType,
 		},
-		Storage: builder.Storage,
 		Varname: varname,
 	}
 	builder.current.AddConstraint(&constraint)
@@ -288,37 +280,7 @@ func (builder *TestBuilder) printListHelper(node models.Node) {
 func (builder *TestBuilder) Run() bool {
 
 	node := builder.head
-	return builder.runHelper(node)
 
-}
-func (builder *TestBuilder) runHelper(node models.Node) bool {
+	return runner.RunHelper(builder.client, node)
 
-	if node == nil {
-		return true
-	}
-
-	_, err := node.Execute(builder.client)
-	if err != nil {
-		log.Print(err)
-		return false
-	}
-	if !node.Check() {
-		return false
-	}
-
-	if len(node.GetNextNodes()) == 1 {
-		return builder.runHelper(node.GetNextNodes()[0])
-	}
-
-	// branches will still run even if a node in the level fails.
-	success := true
-
-	for _, nextNode := range node.GetNextNodes() {
-		successful := builder.runHelper(nextNode)
-		if !successful {
-			success = false
-		}
-	}
-
-	return success
 }

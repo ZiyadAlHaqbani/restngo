@@ -15,16 +15,13 @@ func main() {
 			"https://httpbin.org/json",
 			models.GET,
 			nil,
-		)
-
-	builder1.AddStaticNodeBranch("https://openlibrary.org/search.json", models.GET, nil)
-
-	builder1.AddMatchStoreConstraint(
-		"slideshow.author",
-		"Yours Truly",
-		models.TypeString,
-		"authorName",
-	).
+		).
+		AddMatchStoreConstraint(
+			"slideshow.author",
+			"Yours Truly",
+			models.TypeString,
+			"authorName",
+		).
 		AddDynamicNode("https://openlibrary.org/search.json", models.GET,
 			func(m *map[string]models.TypedVariable) url.Values {
 				key := (*m)["authorName"]
