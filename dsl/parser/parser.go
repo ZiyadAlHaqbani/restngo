@@ -185,11 +185,17 @@ func (parser *Parser) parseConstraint() models.Constraint {
 			Expected: nil,
 			Status:   models.MatchStatus{},
 		}
-		expected_val := parser.consume(scanner.StringLiteral)
+
 		switch expected {
 		case models.TypeFloat:
-			strconv.ParseFloat(expected_val.Content, 64)
+			num := parser.consume(scanner.Number)
+			val, err := strconv.ParseFloat(num.Content, 64)
+			if err != nil {
+				log.Fatalf("ERROR: couldn't convert %q into a number: %+v", num.Content, err)
+			}
+			temp.Expected = val
 		case models.TypeString:
+			expected_val := parser.consume(scanner.StringLiteral)
 			temp.Expected = expected_val.Content
 		}
 		toReturn = &temp
