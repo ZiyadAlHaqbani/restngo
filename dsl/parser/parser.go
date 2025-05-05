@@ -8,6 +8,7 @@ import (
 	"htestp/nodes"
 	"log"
 	"slices"
+	"strconv"
 )
 
 func CreateParser(tokens []scanner.Token) *Parser {
@@ -170,6 +171,33 @@ func (parser *Parser) parseConstraint() models.Constraint {
 		toReturn = &constraints.Exist_Constraint{
 			Field: field.Content,
 			Type:  expected,
+		}
+	case "ExistStoreConstraint":
+		varname := parser.consume(scanner.StringLiteral)
+		toReturn = &constraints.Exist_Store_Constraint{
+			InnerConstraint: constraints.Exist_Constraint{},
+			Varname:         varname.Content,
+		}
+	case "MatchConstraint":
+		temp := constraints.Match_Constraint{
+			Field:    field.Content,
+			Type:     expected,
+			Expected: nil,
+			Status:   models.MatchStatus{},
+		}
+		expected_val := parser.consume(scanner.StringLiteral)
+		switch expected {
+		case models.TypeFloat:
+			strconv.ParseFloat(expected_val.Content, 64)
+		case models.TypeString:
+			temp.Expected = expected_val.Content
+		}
+		toReturn = &temp
+	case "MatchStoreConstraint":
+		varname := parser.consume(scanner.StringLiteral)
+		toReturn = &constraints.Exist_Store_Constraint{
+			InnerConstraint: constraints.Exist_Constraint{},
+			Varname:         varname.Content,
 		}
 	}
 
