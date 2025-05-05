@@ -2,6 +2,7 @@ package scanner
 
 import (
 	"htestp/models"
+	"log"
 	"strconv"
 )
 
@@ -94,4 +95,15 @@ type Token struct {
 func (token Token) ToString() string {
 	return "content: " + token.Content + ", type: " + TokenTypeToString[token.Type] +
 		", line: " + strconv.Itoa(token.Line) + ", start at: " + strconv.Itoa(token.Start)
+}
+
+func (token Token) GetPlainString() string {
+	if token.Type == StringLiteral {
+		temp := token.Content[1:len(token.Content)]
+		temp = temp[0 : len(token.Content)-1]
+		return temp
+	}
+
+	log.Fatalf("ERROR: GetPlainString() is only for stringliteral tokens")
+	return ""
 }

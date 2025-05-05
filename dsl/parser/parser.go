@@ -23,7 +23,7 @@ type Parser struct {
 
 	CURRENT_TOKEN scanner.Token
 
-	head models.Node
+	Head models.Node
 }
 
 func (parser *Parser) peek() scanner.Token {
@@ -59,7 +59,7 @@ func (parser *Parser) consume(t scanner.TokenType) scanner.Token {
 }
 
 func (parser *Parser) Parse() {
-	parser.head = parser.parseExpression()
+	parser.Head = parser.parseExpression()
 }
 
 func (parser *Parser) parseExpression() models.Node {

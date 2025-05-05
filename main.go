@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"htestp/dsl/parser"
 	"htestp/dsl/scanner"
+	"htestp/runner"
+	"net/http"
 )
 
 func main() {
@@ -19,6 +21,8 @@ StaticNode("ID:123432", GET, "https://github.com", ExistConstraint("ID.users.nam
 
 	p := parser.CreateParser(s.Scan())
 	p.Parse()
+
+	runner.RunHelper(http.DefaultClient, p.Head)
 
 	fmt.Printf("END!")
 
