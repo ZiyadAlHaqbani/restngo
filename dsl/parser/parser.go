@@ -20,10 +20,13 @@ type Parser struct {
 	tokens  []scanner.Token
 	current int
 
+	CURRENT_TOKEN scanner.Token
+
 	head models.Node
 }
 
 func (parser *Parser) peek() scanner.Token {
+	parser.CURRENT_TOKEN = parser.tokens[parser.current]
 	return parser.tokens[parser.current]
 }
 
@@ -60,8 +63,6 @@ func (parser *Parser) Parse() {
 
 func (parser *Parser) parseExpression() models.Node {
 	return parser.parseFunction()
-	//_
-	return &nodes.ConditionalNode{}
 }
 
 func (parser *Parser) parseFunction() models.Node {
@@ -142,6 +143,8 @@ func (parser *Parser) parseConstraints() []models.Constraint {
 
 func (parser *Parser) parseConstraint() models.Constraint {
 
+	var toReturn models.Constraint
+
 	identifier := parser.advance()
 	parser.match(scanner.LeftParen)
 
@@ -155,15 +158,14 @@ func (parser *Parser) parseConstraint() models.Constraint {
 
 	switch identifier.Content {
 	case "ExistConstraint":
-		return &constraints.Exist_Constraint{
+		toReturn = &constraints.Exist_Constraint{
 			Field: field.Content,
 			Type:  expected,
 		}
 	}
-	if !parser.match(scanner.Comma) {
-		return nil
-	}
 
-	log.Fatalf("ERROR: couldn't parse constraint for token sequence starting at: %+v", identifier)
-	return nil
+	parser.consume(scanner.RightParen)
+	parser.match(scanner.Comma)
+
+	return toReturn
 }

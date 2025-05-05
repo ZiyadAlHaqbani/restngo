@@ -10,7 +10,7 @@ func main() {
 
 	source :=
 		`
-StaticNode("ID:123432", GET, "https://github.com", ExistConstraint("ID", STRING),
+StaticNode("ID:123432", GET, "https://github.com", ExistConstraint("ID", STRING), ExistConstraint("Users", ARRAY),
 	StaticNode()
 )
 		`
