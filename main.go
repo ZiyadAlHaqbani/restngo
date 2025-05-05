@@ -2,61 +2,25 @@ package main
 
 import (
 	"fmt"
-	test_builder "htestp/builder"
-	"htestp/models"
-	"net/url"
+	"htestp/dsl/scanner"
 )
 
 func main() {
 
-	builder1 := test_builder.CreateNewBuilder()
-	builder1.
-		AddStaticNode(
-			"https://httpbin.org/json",
-			models.GET,
-			nil,
-		)
+	source :=
+		`
+StaticNode("https://github.com", GET, ExistConstraint(),
+	StaticNode(), 1000
+)
+		`
 
-	builder1.AddStaticNodeBranch("https://openlibrary.org/search.json", models.GET, nil)
+	s := scanner.CreateScanner(source)
+	s.Scan()
 
-	builder1.AddMatchStoreConstraint(
-		"slideshow.author",
-		"Yours Truly",
-		models.TypeString,
-		"authorName",
-	).
-		AddDynamicNode("https://openlibrary.org/search.json", models.GET,
-			func(m *map[string]models.TypedVariable) url.Values {
-				key := (*m)["authorName"]
-				params := url.Values{}
-				params.Set("q", key.Value.(string))
-				return params
-			}, nil).
-		AddExistConstraint("docs[2].author_key[0]", models.TypeString).
-		AddMatchStoreConstraint(
-			"docs[2].author_key[0]",
-			"OL3783157A",
-			models.TypeString,
-			"authorKey")
-
-	builder1.AddDynamicNodeBranch(
-		"https://httpbin.org/get",
-		models.GET,
-		func(m *map[string]models.TypedVariable) url.Values {
-			authorKey := (*m)["authorKey"]
-			params := url.Values{}
-			params.Set("author_key", authorKey.Value.(string))
-			return params
-		},
-		nil,
-	).AddExistConstraint("args.author_key", models.TypeString)
-
-	//	each operation builds a new branch, with the parent being the previous builder's current branch
-	//	the builder doesn't proceed to any branch and stays at current
-
-	//	WARNING: when running the test, you must always start from the root builder
-	status := builder1.Run()
-	fmt.Printf("Test Passed: %v", status)
-	builder1.PrintList()
+	testScanner := scanner.CreateScanner(s.ToString())
+	testScanner.Scan()
+	fmt.Printf("%s\n", s.ToString())
+	fmt.Printf("%s\n", testScanner.ToString())
+	fmt.Printf("%+v", testScanner.ToString() == s.ToString())
 	//program end
 }
