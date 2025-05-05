@@ -1,4 +1,4 @@
-package test_builder
+package builder
 
 import (
 	"bytes"
