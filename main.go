@@ -2,9 +2,7 @@ package main
 
 import (
 	"fmt"
-	test_builder "htestp/builder"
-	"htestp/models"
-	"net/url"
+	"htestp/dsl/scanner"
 )
 
 func main() {
@@ -48,12 +46,14 @@ func main() {
 		nil,
 	).AddExistConstraint("args.author_key", models.TypeString)
 
-	//	each operation builds a new branch, with the parent being the previous builder's current branch
-	//	the builder doesn't proceed to any branch and stays at current
 
-	//	WARNING: when running the test, you must always start from the root builder
-	status := builder1.Run()
-	fmt.Printf("Test Passed: %v", status)
-	builder1.PrintList()
+	s := scanner.CreateScanner(source)
+	s.Scan()
+
+	testScanner := scanner.CreateScanner(s.ToString())
+	testScanner.Scan()
+	fmt.Printf("%s\n", s.ToString())
+	fmt.Printf("%s\n", testScanner.ToString())
+	fmt.Printf("%+v", testScanner.ToString() == s.ToString())
 	//program end
 }
