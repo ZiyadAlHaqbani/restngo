@@ -121,7 +121,16 @@ func (parser *Parser) parseStaticNode() models.Node {
 
 	staticNode.Constraints = constraints
 
-	parser.parseNode() //FDFDFSDFSD
+	children := []models.Node{}
+	for parser.check(scanner.Node) {
+		new := parser.parseNode()
+		children = append(children, new)
+		commaFound := parser.match(scanner.Comma)
+		_ = commaFound
+	}
+	staticNode.Next = children
+
+	parser.consume(scanner.RightParen)
 
 	//_
 	return &staticNode
