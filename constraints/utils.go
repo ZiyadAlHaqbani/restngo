@@ -403,3 +403,31 @@ func checkValue(value interface{}, expected interface{}, data_type models.MatchT
 	}
 
 }
+
+func ConvertToFloat(value interface{}) (float64, error) {
+	switch v := value.(type) {
+	case float32:
+		return float64(v), nil
+	case float64:
+		return v, nil
+	case int:
+		return float64(v), nil
+	case uint:
+		return float64(v), nil
+	case int8:
+		return float64(v), nil
+	case int16:
+		return float64(v), nil
+	case int32:
+		return float64(v), nil
+	case uint8:
+		return float64(v), nil
+	case uint16:
+		return float64(v), nil
+	case uint32:
+		return float64(v), nil
+	case uint64:
+		return float64(v), nil
+	}
+	return 0, fmt.Errorf("unsupported type: %T", value)
+}
