@@ -313,3 +313,93 @@ func checkType(value interface{}, data_type models.MatchType, field string) mode
 	}
 
 }
+
+func checkValue(value interface{}, expected interface{}, data_type models.MatchType, field string) models.MatchStatus {
+
+	switch data_type {
+	case models.TypeString:
+		val, valid := value.(string)
+		if !valid {
+			return models.MatchStatus{
+				Failed:  true,
+				Message: fmt.Sprintf("field: %s doesn't match expected type: %s", field, data_type),
+			}
+		}
+		if val != expected {
+			return models.MatchStatus{
+				Failed:  true,
+				Message: fmt.Sprintf("field: %s doesn't match expected value: %s", field, expected),
+			}
+		}
+	case models.TypeFloat:
+		val, valid := value.(float64)
+		if !valid {
+			return models.MatchStatus{
+				Failed:  true,
+				Message: fmt.Sprintf("field: %s doesn't match expected type: %s", field, data_type),
+			}
+		}
+		if val != expected {
+			return models.MatchStatus{
+				Failed:  true,
+				Message: fmt.Sprintf("field: %s doesn't match expected value: %s", field, expected),
+			}
+		}
+	case models.TypeBool:
+		val, valid := value.(bool)
+		if !valid {
+			return models.MatchStatus{
+				Failed:  true,
+				Message: fmt.Sprintf("field: %s with type: %T doesn't match expected type: %s", field, value, data_type),
+			}
+		}
+		if val != expected {
+			return models.MatchStatus{
+				Failed:  true,
+				Message: fmt.Sprintf("field: %s doesn't match expected value: %s", field, expected),
+			}
+		}
+	case models.TypeArray:
+		val, valid := value.([]interface{})
+		if !valid {
+			return models.MatchStatus{
+				Failed:  true,
+				Message: fmt.Sprintf("field: %s with type: %T doesn't match expected type: %s", field, value, data_type),
+			}
+		}
+		valid, msg := matchLists(val, expected.([]interface{}))
+		if !valid {
+			return models.MatchStatus{
+				Failed:  true,
+				Message: msg,
+			}
+		}
+	case models.TypeObject:
+		val, valid := value.(map[string]interface{})
+		if !valid {
+			return models.MatchStatus{
+				Failed:  true,
+				Message: fmt.Sprintf("field: %s with type: %T doesn't match expected type: %s", field, value, data_type),
+			}
+		}
+		valid, msg := matchMaps(val, expected.(map[string]interface{}))
+		if !valid {
+			return models.MatchStatus{
+				Failed:  true,
+				Message: msg,
+			}
+		}
+
+	default:
+		panic("ERROR: user assigned type outside of the defined types in 'MatchType'")
+
+	}
+
+	return models.MatchStatus{
+		Failed: false,
+		// Failed_at_node: &node,
+		ValueType:    data_type,
+		MatchedValue: value,
+	}
+
+}

@@ -28,8 +28,16 @@ func (match *Match_Constraint) constrain(node models.Node) models.MatchStatus {
 			Failed:  true,
 			Message: msg}
 	}
-
 	status := checkType(result, match.Type, match.Field)
+	if status.Failed {
+		status.Failed_at_node = &node
+		return status
+	}
+	status = checkValue(result, match.Expected, match.Type, match.Field)
+	if status.Failed {
+		status.Failed_at_node = &node
+		return status
+	}
 	status.Failed_at_node = &node
 	return status
 }
