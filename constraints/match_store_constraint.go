@@ -2,22 +2,25 @@ package constraints
 
 import (
 	"htestp/models"
+	"htestp/runner/context"
 )
 
 type Match_Store_Constraint struct {
 	InnerConstraint Match_Constraint
-	Storage         *map[string]models.TypedVariable // Reference to global storage
-	Varname         string                           // varname represents the name of the variable used for storage mapping in global storage.
+	Varname         string // varname represents the name of the variable used for storage mapping in global storage.
 }
 
 func (match *Match_Store_Constraint) Constrain(node models.Node) models.MatchStatus {
 
 	status := match.InnerConstraint.Constrain(node)
 	if !status.Failed {
-		(*match.Storage)[match.Varname] = models.TypedVariable{
+		newVar := models.TypedVariable{
 			Value: status.MatchedValue,
 			Type:  match.InnerConstraint.Type,
 		}
+
+		context.StoreVariable(match.Varname, newVar)
+
 	}
 	return status
 }
