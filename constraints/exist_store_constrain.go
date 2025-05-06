@@ -2,11 +2,11 @@ package constraints
 
 import (
 	"htestp/models"
+	"htestp/runner/context"
 )
 
 type Exist_Store_Constraint struct {
 	InnerConstraint Exist_Constraint
-	Storage         *map[string]models.TypedVariable
 	Varname         string
 }
 
@@ -14,10 +14,12 @@ func (match *Exist_Store_Constraint) Constrain(node models.Node) models.MatchSta
 
 	status := match.InnerConstraint.Constrain(node)
 	if node.Successful() {
-		(*match.Storage)[match.Varname] = models.TypedVariable{
+		newVar := models.TypedVariable{
 			Value: status.MatchedValue,
 			Type:  match.InnerConstraint.Type,
 		}
+
+		context.StoreVariable(match.Varname, newVar)
 	}
 	return status
 }

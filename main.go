@@ -18,7 +18,6 @@ StaticNode("ID:123432", GET, "https://github.com", ExistConstraint("ID.users.nam
 		`
 
 	s := scanner.CreateScanner(source)
-
 	p := parser.CreateParser(s.Scan())
 	p.Parse()
 

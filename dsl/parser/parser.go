@@ -20,9 +20,8 @@ func CreateParser(tokens []scanner.Token) *Parser {
 type Parser struct {
 	tokens  []scanner.Token
 	current int
-
+  
 	CURRENT_TOKEN scanner.Token
-
 	Head models.Node
 }
 
@@ -54,6 +53,7 @@ func (parser *Parser) consume(t scanner.TokenType) scanner.Token {
 	if parser.peek().Type == t {
 		return parser.advance()
 	}
+
 	log.Fatalf("ERROR: expected %s, but found: '%s'", scanner.TokenTypeToString[t], parser.peek().ToString())
 	return scanner.Token{}
 }
@@ -141,17 +141,20 @@ func (parser *Parser) parseConstraints() []models.Constraint {
 	var constraints []models.Constraint
 
 	for parser.check(scanner.Constraint) {
+
 		new := parser.parseConstraint()
 		if new == nil {
 			break
 		}
 		constraints = append(constraints, new)
+
 	}
 
 	return constraints
 }
 
 func (parser *Parser) parseConstraint() models.Constraint {
+
 
 	var toReturn models.Constraint
 
@@ -211,4 +214,5 @@ func (parser *Parser) parseConstraint() models.Constraint {
 	parser.match(scanner.Comma)
 
 	return toReturn
+
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	httphandler "htestp/http_handler"
 	"htestp/models"
+	"htestp/runner/context"
 	"net/http"
 	"net/url"
 )
@@ -15,7 +16,6 @@ type DynamicNode struct {
 	// TODO: Use url values instead of map[string]string
 	QueryBuilderFunc func(storage *map[string]models.TypedVariable) url.Values
 	BodyBuilderFunc  func(storage *map[string]models.TypedVariable) map[string]interface{}
-	Storage          *map[string]models.TypedVariable
 	Next             []models.Node
 }
 
@@ -43,13 +43,13 @@ func (node *DynamicNode) Execute(client *http.Client) (httphandler.HTTPResponse,
 
 	if node.QueryBuilderFunc != nil {
 
-		params := node.QueryBuilderFunc(node.Storage)
+		params := node.QueryBuilderFunc(&context.Storage)
 		request_params := params.Encode()
 		node.InnerNode.Request.Url += "?" + request_params
 	}
 
 	if node.BodyBuilderFunc != nil {
-		body := node.BodyBuilderFunc(node.Storage)
+		body := node.BodyBuilderFunc(&context.Storage)
 		byteArray, err := json.Marshal(body)
 		if err != nil {
 			return httphandler.HTTPResponse{}, fmt.Errorf("failed to encode the generated request body")

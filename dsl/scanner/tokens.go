@@ -52,7 +52,6 @@ var TokenTypeToString = map[TokenType]string{
 	URL:           "URL",
 	METHOD:        "METHOD",
 }
-
 // Map strings to specific token types
 var TypesMap = map[string]TokenType{
 	"StaticNode":      Node,
