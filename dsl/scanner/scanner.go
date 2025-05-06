@@ -179,11 +179,20 @@ func (scanner *Scanner) eof() bool {
 
 func (scanner *Scanner) addToken(Type TokenType) Token {
 	token := Token{
-		Content: scanner.source[scanner.start:scanner.current],
-		Type:    Type,
-		Start:   scanner.current,
-		Line:    scanner.line,
+		Type:  Type,
+		Start: scanner.current,
+		Line:  scanner.line,
 	}
+
+	if Type == StringLiteral {
+		temp := scanner.source[scanner.start:scanner.current]
+		temp = temp[1:]
+		temp = temp[:len(temp)-1]
+		token.Content = temp
+	} else {
+		token.Content = scanner.source[scanner.start:scanner.current]
+	}
+
 	scanner.tokens = append(scanner.tokens, token)
 
 	return token
