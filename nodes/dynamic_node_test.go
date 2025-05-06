@@ -2,6 +2,7 @@ package nodes_test
 
 import (
 	builder "htestp/builder"
+	"htestp/constraints"
 	httphandler "htestp/http_handler"
 	"htestp/models"
 	nodes "htestp/nodes"
@@ -17,8 +18,144 @@ type TestDynamicNode struct {
 }
 
 func TestExecuteDynamicnode(t *testing.T) {
-
+	t.Run("Execute returns the result of InnerNode's Execute", func(t *testing.T) {
+		testNode := TestDynamicNode{
+			DynamicNode: &nodes.DynamicNode{},
+			Client:      &http.Client{},
+		}
+		testNode.InnerNode = nodes.StaticNode{
+			Request: httphandler.Request{
+				Url:    "https://dummyjson.com/products",
+				Method: string(models.GET),
+			},
+		}
+		testNode.InnerNode.Execute(testNode.Client)
+		resp, err := testNode.Execute(testNode.Client)
+		assert.Nil(t, err)
+		assert.Equal(t, testNode.InnerNode.GetResp(), resp)
+	})
+	t.Run("Execute returns an error if InnerNode's Execute returns an error", func(t *testing.T) {
+		testNode := TestDynamicNode{
+			DynamicNode: &nodes.DynamicNode{},
+			Client:      &http.Client{},
+		}
+		testNode.InnerNode = nodes.StaticNode{
+			Request: httphandler.Request{
+				Url:    "waitthisdoesntexist",
+				Method: "DONTDONIT",
+			},
+		}
+		_, err := testNode.Execute(testNode.Client)
+		assert.NotNil(t, err)
+	})
+	t.Run("Execute returns the expected result", func(t *testing.T) {
+		testNode := TestDynamicNode{
+			DynamicNode: &nodes.DynamicNode{},
+			Client:      &http.Client{},
+		}
+		testNode.InnerNode = nodes.StaticNode{
+			Request: httphandler.Request{
+				Url:    "https://dummyjson.com/products",
+				Method: string(models.GET),
+			},
+		}
+		testNode.InnerNode.Execute(testNode.Client)
+		resp, err := testNode.Execute(testNode.Client)
+		assert.Nil(t, err)
+		assert.Equal(t, testNode.InnerNode.GetResp(), resp)
+	})
 }
+func TestCheck(t *testing.T) {
+	t.Run("Check returns the result of InnerNode's Check", func(t *testing.T) {
+		testNode := TestDynamicNode{
+			DynamicNode: &nodes.DynamicNode{},
+			Client:      &http.Client{},
+		}
+		testNode.InnerNode = nodes.StaticNode{
+			Request: httphandler.Request{
+				Url:    "https://dummyjson.com/products",
+				Method: string(models.GET),
+			},
+		}
+		testNode.InnerNode.Execute(testNode.Client)
+		assert.Equal(t, testNode.InnerNode.Check(), testNode.Check())
+	})
+	t.Run("Check returns false if InnerNode's Check returns false", func(t *testing.T) {
+		testNode := TestDynamicNode{
+			DynamicNode: &nodes.DynamicNode{},
+			Client:      &http.Client{},
+		}
+		testNode.InnerNode = nodes.StaticNode{
+			Request: httphandler.Request{
+				Url:    "https://dummyjson.com/products",
+				Method: string(models.GET),
+			},
+		}
+		testNode.AddConstraint(&constraints.Match_Constraint{
+			Field:    "products[0].id",
+			Type:     models.TypeFloat,
+			Expected: 0,
+		})
+		testNode.InnerNode.Execute(testNode.Client)
+		assert.Equal(t, false, testNode.Check())
+	})
+	t.Run("Check returns true if InnerNode's Check returns true", func(t *testing.T) {
+		testNode := TestDynamicNode{
+			DynamicNode: &nodes.DynamicNode{},
+			Client:      &http.Client{},
+		}
+		testNode.InnerNode = nodes.StaticNode{
+			Request: httphandler.Request{
+				Url:    "https://dummyjson.com/products",
+				Method: string(models.GET),
+			},
+		}
+		testNode.AddConstraint(&constraints.Match_Constraint{
+			Field:    "products[0].id",
+			Type:     models.TypeFloat,
+			Expected: 1,
+		})
+		testNode.InnerNode.Execute(testNode.Client)
+		assert.Equal(t, true, testNode.Check())
+	})
+}
+func TestGetResp(t *testing.T) {
+	t.Run("GetResp returns the response from InnerNode", func(t *testing.T) {
+		testNode := TestDynamicNode{
+			DynamicNode: &nodes.DynamicNode{},
+			Client:      &http.Client{},
+		}
+		testNode.InnerNode = nodes.StaticNode{
+			Request: httphandler.Request{
+				Url:    "https://dummyjson.com/products",
+				Method: string(models.GET),
+			},
+		}
+		testNode.InnerNode.Execute(testNode.Client)
+		assert.Equal(t, testNode.InnerNode.GetResp(), testNode.GetResp())
+	})
+}
+
+func TestAddConstraint(t *testing.T) {
+	t.Run("AddConstraint adds to InnerNode's constraints", func(t *testing.T) {
+		testNode := nodes.DynamicNode{}
+		constraint := constraints.Match_Constraint{
+			Field:    "title",
+			Type:     models.TypeString,
+			Expected: "iPhone 9",
+		}
+		testNode.AddConstraint(&constraint)
+		assert.Equal(t, 1, len(testNode.InnerNode.Constraints))
+		assert.Equal(t, &constraint, testNode.InnerNode.Constraints[0])
+	})
+	t.Run("AddConstraint adds nil to InnerNode's constraints", func(t *testing.T) {
+		testNode := nodes.DynamicNode{}
+		testNode.AddConstraint(nil)
+		assert.Equal(t, 1, len(testNode.InnerNode.Constraints))
+		assert.Nil(t, testNode.InnerNode.Constraints[0])
+	})
+}
+
 func TestGetNextNodes(t *testing.T) {
 	t.Run("Added multiple nodes should be returned exactly when using GetNextNodes", func(t *testing.T) {
 		StaticNodeOne := nodes.StaticNode{
@@ -41,6 +178,7 @@ func TestGetNextNodes(t *testing.T) {
 		testBuilder.AddStaticNodeBranch("google.com", models.GET, nil)
 		testBuilder.AddStaticNodeBranch("youtube.com", models.GET, nil)
 
+		assert.Equal(t, 2, len((*testBuilder.Nodes)["1"].(*nodes.DynamicNode).Next))
 		assert.Equal(t, ExpectedNodes, (*testBuilder.Nodes)["1"].GetNextNodes())
 	})
 	// TODO: dont add nodes and check

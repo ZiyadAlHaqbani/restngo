@@ -115,19 +115,10 @@ func Handle(client *http.Client, request Request) (*HTTPResponse, error) {
 		return nil, fmt.Errorf("ERROR: failed to create request: %+v\n\t%+v", request, req_err)
 	}
 
-	{
-
-		for range request.Retries + 1 {
-			resp, err = client.Do(req)
-			if err == nil {
-				break
-			}
-		}
-		for range request.Retries + 1 {
-			resp, err = client.Do(req)
-			if err == nil {
-				break
-			}
+	for range request.Retries + 1 {
+		resp, err = client.Do(req)
+		if err == nil {
+			break
 		}
 	}
 
