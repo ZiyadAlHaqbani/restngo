@@ -1,6 +1,10 @@
 package scanner
 
-import "htestp/models"
+import (
+	"htestp/models"
+	"log"
+	"strconv"
+)
 
 type TokenType int
 
@@ -30,6 +34,24 @@ const (
 	METHOD
 )
 
+var TokenTypeToString = map[TokenType]string{
+	EOF:           "EOF",
+	Comma:         "Comma",
+	LeftParen:     "LeftParen",
+	RightParen:    "RightParen",
+	Number:        "Number",
+	StringLiteral: "StringLiteral",
+	Float64:       "Float64",
+	BOOL:          "BOOL",
+	STRING:        "STRING",
+	ARRAY:         "ARRAY",
+	OBJECT:        "OBJECT",
+	Identifier:    "Identifier",
+	Node:          "Node",
+	Constraint:    "Constraint",
+	URL:           "URL",
+	METHOD:        "METHOD",
+}
 // Map strings to specific token types
 var TypesMap = map[string]TokenType{
 	"StaticNode":      Node,
@@ -65,6 +87,22 @@ var DataTypesMap = map[TokenType]models.MatchType{
 type Token struct {
 	Content string
 	Type    TokenType
+	Start   int
+	Line    int
+}
 
-	Line int
+func (token Token) ToString() string {
+	return "content: " + token.Content + ", type: " + TokenTypeToString[token.Type] +
+		", line: " + strconv.Itoa(token.Line) + ", start at: " + strconv.Itoa(token.Start)
+}
+
+func (token Token) GetPlainString() string {
+	if token.Type == StringLiteral {
+		temp := token.Content[1:len(token.Content)]
+		temp = temp[0 : len(token.Content)-1]
+		return temp
+	}
+
+	log.Fatalf("ERROR: GetPlainString() is only for stringliteral tokens")
+	return ""
 }

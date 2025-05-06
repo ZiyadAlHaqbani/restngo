@@ -8,16 +8,25 @@ import (
 	"htestp/nodes"
 	"log"
 	"slices"
+	"strconv"
 )
+
+func CreateParser(tokens []scanner.Token) *Parser {
+	return &Parser{
+		tokens: tokens,
+	}
+}
 
 type Parser struct {
 	tokens  []scanner.Token
 	current int
-
-	head models.Node
+  
+	CURRENT_TOKEN scanner.Token
+	Head models.Node
 }
 
 func (parser *Parser) peek() scanner.Token {
+	parser.CURRENT_TOKEN = parser.tokens[parser.current]
 	return parser.tokens[parser.current]
 }
 
@@ -44,26 +53,22 @@ func (parser *Parser) consume(t scanner.TokenType) scanner.Token {
 	if parser.peek().Type == t {
 		return parser.advance()
 	}
-	log.Fatalf("ERROR: expected %+v, but found: '%+v'", t, parser.peek())
+
+	log.Fatalf("ERROR: expected %s, but found: '%s'", scanner.TokenTypeToString[t], parser.peek().ToString())
 	return scanner.Token{}
 }
 
-func (parser *Parser) parse() models.Node {
-	parser.parseExpression()
-
-	//_
-	return &nodes.ConditionalNode{}
+func (parser *Parser) Parse() {
+	parser.Head = parser.parseExpression()
 }
 
 func (parser *Parser) parseExpression() models.Node {
-	parser.parseFunction()
-	//_
-	return &nodes.ConditionalNode{}
+	return parser.parseFunction()
 }
 
 func (parser *Parser) parseFunction() models.Node {
 	if scanner.TypesMap[parser.peek().Content] == scanner.Node {
-		parser.parseNode()
+		return parser.parseNode()
 	} else if scanner.TypesMap[parser.peek().Content] == scanner.Constraint {
 		log.Fatal("ERROR: constraints must only be defined within nodes, and not outside of them")
 	}
@@ -80,7 +85,7 @@ func (parser *Parser) parseNode() models.Node {
 	case "StaticNode":
 		return parser.parseStaticNode()
 	case "DynamicNode":
-		log.Fatal("ERROR: DynamicNode is not supported.")
+		log.Fatal("ERROR: DynamicNode is not supported yet.")
 	default:
 		log.Fatalf("ERROR: unsupported node type: %q, at: %+v", id.Content, id)
 
@@ -117,8 +122,19 @@ func (parser *Parser) parseStaticNode() models.Node {
 
 	staticNode.Constraints = constraints
 
+	children := []models.Node{}
+	for parser.check(scanner.Node) {
+		new := parser.parseNode()
+		children = append(children, new)
+		commaFound := parser.match(scanner.Comma)
+		_ = commaFound
+	}
+	staticNode.Next = children
+
+	parser.consume(scanner.RightParen)
+
 	//_
-	return &nodes.ConditionalNode{}
+	return &staticNode
 }
 
 func (parser *Parser) parseConstraints() []models.Constraint {
@@ -126,13 +142,21 @@ func (parser *Parser) parseConstraints() []models.Constraint {
 
 	for parser.check(scanner.Constraint) {
 
-		// constraints = append(constraints, parseConstraint())
+		new := parser.parseConstraint()
+		if new == nil {
+			break
+		}
+		constraints = append(constraints, new)
+
 	}
 
 	return constraints
 }
 
 func (parser *Parser) parseConstraint() models.Constraint {
+
+
+	var toReturn models.Constraint
 
 	identifier := parser.advance()
 	parser.match(scanner.LeftParen)
@@ -142,17 +166,53 @@ func (parser *Parser) parseConstraint() models.Constraint {
 
 	expected, exists := scanner.DataTypesMap[parser.advance().Type]
 	if !exists {
-		log.Fatalf("ERROR: ")
+		log.Fatalf("ERROR: unrecognized type: %v", parser.advance().Type)
 	}
 
 	switch identifier.Content {
 	case "ExistConstraint":
-		return &constraints.Exist_Constraint{
+		toReturn = &constraints.Exist_Constraint{
 			Field: field.Content,
 			Type:  expected,
 		}
+	case "ExistStoreConstraint":
+		varname := parser.consume(scanner.StringLiteral)
+		toReturn = &constraints.Exist_Store_Constraint{
+			InnerConstraint: constraints.Exist_Constraint{},
+			Varname:         varname.Content,
+		}
+	case "MatchConstraint":
+		temp := constraints.Match_Constraint{
+			Field:    field.Content,
+			Type:     expected,
+			Expected: nil,
+			Status:   models.MatchStatus{},
+		}
+
+		switch expected {
+		case models.TypeFloat:
+			num := parser.consume(scanner.Number)
+			val, err := strconv.ParseFloat(num.Content, 64)
+			if err != nil {
+				log.Fatalf("ERROR: couldn't convert %q into a number: %+v", num.Content, err)
+			}
+			temp.Expected = val
+		case models.TypeString:
+			expected_val := parser.consume(scanner.StringLiteral)
+			temp.Expected = expected_val.Content
+		}
+		toReturn = &temp
+	case "MatchStoreConstraint":
+		varname := parser.consume(scanner.StringLiteral)
+		toReturn = &constraints.Exist_Store_Constraint{
+			InnerConstraint: constraints.Exist_Constraint{},
+			Varname:         varname.Content,
+		}
 	}
 
-	log.Fatalf("ERROR: couldn't parse constraint for token sequence starting at: %+v", identifier)
-	return nil
+	parser.consume(scanner.RightParen)
+	parser.match(scanner.Comma)
+
+	return toReturn
+
 }
