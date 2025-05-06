@@ -168,6 +168,10 @@ func (scanner *Scanner) number() {
 		scanner.advance()
 	}
 
+	if !isWhiteSpace(scanner.peek()) && scanner.peek() != ',' {
+		log.Fatalf("ERROR: numbers must only end with whitespace or comma ',', at: %+v", scanner.addToken(Number))
+	}
+
 	scanner.addToken(Number)
 }
 
