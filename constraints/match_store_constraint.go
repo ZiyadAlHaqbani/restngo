@@ -2,7 +2,7 @@ package constraints
 
 import (
 	"htestp/models"
-	"htestp/runner"
+	"htestp/runner/context"
 )
 
 type Match_Store_Constraint struct {
@@ -19,7 +19,7 @@ func (match *Match_Store_Constraint) Constrain(node models.Node) models.MatchSta
 			Type:  match.InnerConstraint.Type,
 		}
 
-		runner.StoreVariable(match.Varname, newVar)
+		context.StoreVariable(match.Varname, newVar)
 
 	}
 	return status

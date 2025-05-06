@@ -6,7 +6,7 @@ import (
 	"fmt"
 	httphandler "htestp/http_handler"
 	"htestp/models"
-	"htestp/runner"
+	"htestp/runner/context"
 	"net/http"
 	"net/url"
 )
@@ -43,13 +43,13 @@ func (node *DynamicNode) Execute(client *http.Client) (httphandler.HTTPResponse,
 
 	if node.QueryBuilderFunc != nil {
 
-		params := node.QueryBuilderFunc(&runner.Storage)
+		params := node.QueryBuilderFunc(&context.Storage)
 		request_params := params.Encode()
 		node.InnerNode.Request.Url += "?" + request_params
 	}
 
 	if node.BodyBuilderFunc != nil {
-		body := node.BodyBuilderFunc(&runner.Storage)
+		body := node.BodyBuilderFunc(&context.Storage)
 		byteArray, err := json.Marshal(body)
 		if err != nil {
 			return httphandler.HTTPResponse{}, fmt.Errorf("failed to encode the generated request body")
