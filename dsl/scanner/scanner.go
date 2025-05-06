@@ -132,7 +132,7 @@ func (scanner *Scanner) stringLiteral() {
 	tok := scanner.addToken(StringLiteral)
 
 	if scanner.eof() {
-		log.Fatalf("ERROR: string literals must end with a '\"', at: %+v", tok)
+		log.Panicf("ERROR: string literals must end with a '\"', at: %+v", tok)
 	}
 
 }
@@ -150,12 +150,12 @@ func (scanner *Scanner) identifier() {
 	}
 
 	if scanner.eof() {
-		log.Fatalf("ERROR: string literals must end with a '\"', at: %+v", tok)
+		log.Panicf("ERROR: string literals must end with a '\"', at: %+v", tok)
 	}
 
 	tokType, exists := TypesMap[tok.Content]
 	if !exists {
-		log.Fatalf("ERROR: unrecognized literal: %q at: %+v", tok.Content, tok)
+		log.Panicf("ERROR: unrecognized literal: %q at: %+v", tok.Content, tok)
 	}
 
 	tok.Type = tokType
@@ -169,7 +169,7 @@ func (scanner *Scanner) number() {
 	}
 
 	if !isWhiteSpace(scanner.peek()) && scanner.peek() != ',' {
-		log.Fatalf("ERROR: numbers must only end with whitespace or comma ',', at: %+v", scanner.addToken(Number))
+		log.Panicf("ERROR: numbers must only end with whitespace or comma ',', at: %+v", scanner.addToken(Number))
 	}
 
 	scanner.addToken(Number)
