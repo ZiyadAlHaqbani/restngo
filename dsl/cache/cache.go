@@ -66,3 +66,17 @@ func UnloadFile(file_path string) error {
 
 	return fmt.Errorf("file path: %q doesn't exist in cache", abs_file_path)
 }
+
+func GetFileBytesRaw(file_path string) ([]byte, error) {
+
+	abs_file_path, err := filepath.Abs(file_path)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	if _, exists := cache[abs_file_path]; !exists {
+		return []byte{}, fmt.Errorf("file path: %q doesn't exist in cache", abs_file_path)
+	}
+
+	return cache[abs_file_path], nil
+}

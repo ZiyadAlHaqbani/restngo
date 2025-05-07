@@ -73,3 +73,19 @@ func TestStoreVariableAndRetrieve(t *testing.T) {
 	}
 
 }
+
+func TestPurgeContext(t *testing.T) {
+
+	TestStoreVariableAndRetrieve(t)
+
+	old_length := len(Storage)
+
+	PurgeContext()
+
+	new_length := len(Storage)
+
+	if old_length <= new_length {
+		t.Errorf("expected length to be 0, got : (new: %d, old: %d)", new_length, old_length)
+	}
+
+}
