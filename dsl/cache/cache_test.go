@@ -7,12 +7,12 @@ import (
 
 func TestGetFileBytes(t *testing.T) {
 
-	test_load_contents, err := GetFileBytes("test_load.json")
+	test_load_contents, err := FetchFileBytes("test_load.json")
 	if err != nil {
 		t.Errorf("expected successful first read, got %+v", err)
 	}
 
-	test_load_cache, err := GetFileBytes("test_load.json")
+	test_load_cache, err := FetchFileBytes("test_load.json")
 	if err != nil {
 		t.Errorf("expected successful cache read, got %+v", err)
 	}
