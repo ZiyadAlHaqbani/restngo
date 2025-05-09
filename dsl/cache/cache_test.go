@@ -47,7 +47,7 @@ func TestSweepTTL(t *testing.T) {
 	FetchFileBytes("test_load.json")
 	FetchFileBytes("cache_config.json")
 
-	time.Sleep(time.Millisecond * 10)
+	time.Sleep(time.Millisecond * 20)
 
 	//activate sweep
 	FetchFileBytes("test_load.json")
