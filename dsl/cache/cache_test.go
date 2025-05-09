@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestGetFileBytes(t *testing.T) {
+func TestFetchFileBytes(t *testing.T) {
 
 	test_load_contents, err := FetchFileBytes("test_load.json")
 	if err != nil {
@@ -25,7 +25,7 @@ func TestGetFileBytes(t *testing.T) {
 
 func TestUnloadFile(t *testing.T) {
 
-	TestGetFileBytes(t)
+	TestFetchFileBytes(t)
 
 	UnloadFile("test_load.json")
 
@@ -33,5 +33,9 @@ func TestUnloadFile(t *testing.T) {
 	if err == nil {
 		t.Error("expected err, got nil")
 	}
+
+}
+
+func TestSweep(t *testing.T) {
 
 }

@@ -5,8 +5,11 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"slices"
 	"time"
 )
+
+var _Policies = []string{"TTL", "LRU"}
 
 // workaround to support json unmarshalling a duration type
 type Duration time.Duration
@@ -59,6 +62,10 @@ func loadConfigs() {
 	err = decoder.Decode(&_configs)
 	if err != nil {
 		log.Panicf("couldn't decode the configs: %+v", err)
+	}
+
+	if !slices.Contains(_Policies, _configs.Strategy) {
+		log.Panicf("unrecognized Strategy: %q, instead chose: %v", _configs.Strategy, _Policies)
 	}
 
 }

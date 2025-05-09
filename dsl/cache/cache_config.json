@@ -1,7 +1,7 @@
 {
-    "TTL": "1m",
+    "TTL": "1s",
     "MaxEntries": 10,
     "MaxSizeBytes": 1000000,
-    "Strategy": "LRU",
+    "Strategy": "TTL",
     "SweepTriggerCount": 2
 }
