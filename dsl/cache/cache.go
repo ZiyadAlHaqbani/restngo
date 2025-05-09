@@ -55,6 +55,7 @@ func FetchFileBytes(file_path string) ([]byte, error) {
 
 // this function will always read from file, even if it exists in cache.
 func LoadFile(file_path string) ([]byte, error) {
+	defer sweep()
 
 	abs_file_path, err := filepath.Abs(file_path)
 	if err != nil {
@@ -80,6 +81,7 @@ func LoadFile(file_path string) ([]byte, error) {
 
 // for removing a file from cache, if it doesn't exist return error
 func UnloadFile(file_path string) error {
+	defer sweep()
 
 	abs_file_path, err := filepath.Abs(file_path)
 	if err != nil {
@@ -97,6 +99,7 @@ func UnloadFile(file_path string) error {
 
 // doesn't load files if not found in cache
 func GetFileBytesRaw(file_path string) ([]byte, error) {
+	defer sweep()
 
 	abs_file_path, err := filepath.Abs(file_path)
 	if err != nil {

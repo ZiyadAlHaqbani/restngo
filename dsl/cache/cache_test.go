@@ -3,6 +3,7 @@ package cache
 import (
 	"slices"
 	"testing"
+	"time"
 )
 
 func TestFetchFileBytes(t *testing.T) {
@@ -36,6 +37,18 @@ func TestUnloadFile(t *testing.T) {
 
 }
 
-func TestSweep(t *testing.T) {
+func TestSweepTTL(t *testing.T) {
 
+	_configs.SweepTriggerCount = 1
+	_configs.TTL = Duration(time.Microsecond * 10)
+	_configs.Strategy = "TTL"
+
+	LoadFile("test_load.json")
+	LoadFile("cache_config.json")
+
+	LoadFile("test_load.json")
+	LoadFile("test_load.json")
+	LoadFile("test_load.json")
+
+	t.Errorf("%v\n%+v", cache, metadata)
 }
