@@ -159,7 +159,7 @@ func traverse(field string, obj interface{}) (interface{}, string) {
 			}
 			temp_obj = temp_list[traversal.Index]
 		} else {
-			log.Fatalf("ERROR: malformed traversal: %+v, is neither field nor index.", traversal)
+			log.Panicf("ERROR: malformed traversal: %+v, is neither field nor index.", traversal)
 		}
 	}
 
@@ -177,7 +177,7 @@ func parseJSONPath(field string) (traversals []models.Traversal, found bool) {
 
 	switch field[0] {
 	case '.':
-		log.Fatalf("ERROR: constraint fields can't start with '.', it must either start with field or index.")
+		log.Panicf("ERROR: constraint fields can't start with '.', it must either start with field or index.")
 	case '[':
 		//	parsing index brackets
 		start := 1
@@ -188,13 +188,13 @@ func parseJSONPath(field string) (traversals []models.Traversal, found bool) {
 			log.Printf("ERROR: reached end of field without finding a matching ']'.")
 			log.Printf("\t%s%c", field[:i-1], field[i-1])
 			log.Print("\t" + strings.Repeat(" ", i-1) + "^")
-			log.Fatal("\t" + strings.Repeat(" ", i-1) + "|")
+			log.Panic("\t" + strings.Repeat(" ", i-1) + "|")
 		}
 		i++
 		index_str := field[start : i-1]
 		index, err := strconv.Atoi(index_str)
 		if err != nil {
-			log.Fatalf("ERROR: %+v, for string: %s", err, index_str)
+			log.Panicf("ERROR: %+v, for string: %s", err, index_str)
 		}
 		traversals = append(traversals, models.IndexTraversal(index))
 	default:
@@ -230,13 +230,13 @@ func parseJSONPath(field string) (traversals []models.Traversal, found bool) {
 				log.Printf("ERROR: reached end of field without finding a matching ']'.")
 				log.Printf("\t%s%c", field[:i-1], field[i-1])
 				log.Print("\t" + strings.Repeat(" ", i-1) + "^")
-				log.Fatal("\t" + strings.Repeat(" ", i-1) + "|")
+				log.Panic("\t" + strings.Repeat(" ", i-1) + "|")
 			}
 			i++
 			index_str := field[start : i-1]
 			index, err := strconv.Atoi(index_str)
 			if err != nil {
-				log.Fatalf("ERROR: %+v, for string: %s", err, index_str)
+				log.Panicf("ERROR: %+v, for string: %s", err, index_str)
 			}
 			traversals = append(traversals, models.IndexTraversal(index))
 		default:
@@ -248,7 +248,7 @@ func parseJSONPath(field string) (traversals []models.Traversal, found bool) {
 				log.Printf("%s%c%s", field[:start], field[start], field[start+1:])
 			}
 			log.Printf(strings.Repeat(" ", start) + "^")
-			log.Fatalf(strings.Repeat(" ", start) + "|")
+			log.Panicf(strings.Repeat(" ", start) + "|")
 		}
 	}
 

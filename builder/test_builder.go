@@ -36,7 +36,7 @@ type TestBuilder struct {
 func (builder *TestBuilder) AddStaticNodeId(id string, url string, method models.HTTPMethod, body *bytes.Buffer) *TestBuilder {
 
 	if _, exists := (*builder.Nodes)[id]; exists {
-		log.Fatalf("ERROR: node with id : %q already exists!", id)
+		log.Panicf("ERROR: node with id : %q already exists!", id)
 		return builder
 	}
 
@@ -71,7 +71,7 @@ func (builder *TestBuilder) AddStaticNode(url string, method models.HTTPMethod, 
 func (builder *TestBuilder) AddStaticNodeRawId(id string, request httphandler.Request) *TestBuilder {
 
 	if _, exists := (*builder.Nodes)[id]; exists {
-		log.Fatalf("ERROR: node with id : %q already exists!", id)
+		log.Panicf("ERROR: node with id : %q already exists!", id)
 		return builder
 	}
 
@@ -105,7 +105,7 @@ func (builder *TestBuilder) AddDynamicNode(url string, method models.HTTPMethod,
 func (builder *TestBuilder) AddDynamicNodeId(id string, url string, method models.HTTPMethod, queryBuilder func(*map[string]models.TypedVariable) url.Values, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
 
 	if _, exists := (*builder.Nodes)[id]; exists {
-		log.Fatalf("ERROR: node with id : %q already exists!", id)
+		log.Panicf("ERROR: node with id : %q already exists!", id)
 		return builder
 	}
 
@@ -131,7 +131,7 @@ func (builder *TestBuilder) AddDynamicNodeId(id string, url string, method model
 func (builder *TestBuilder) AddDynamicNodeRawId(id string, request httphandler.Request, queryBuilder func(*map[string]models.TypedVariable) url.Values, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
 
 	if _, exists := (*builder.Nodes)[id]; exists {
-		log.Fatalf("ERROR: node with id : %q already exists!", id)
+		log.Panicf("ERROR: node with id : %q already exists!", id)
 		return builder
 	}
 
