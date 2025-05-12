@@ -38,7 +38,8 @@ jobs:
     - name: Check for usage of fatal in source
       run: |
         set -e
-        if find -name "*.go" -exec grep -Hn "Fatal" {} +; then
-            echo "::error ::Found disallow Fatal*() calls"
+        echo "Checking for disallowed usage of testing.T methods..."
+        if find . -name "*.go" -exec grep -EIHn '\b\w+\s*\.\s*(Errorf|Error|Fatalf|Fatal|FailNow|Fail)\s*\(' {} +; then
+            echo "::error ::Found disallowed testing.T method calls"
             exit 1
         fi
