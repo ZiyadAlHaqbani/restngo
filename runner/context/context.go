@@ -3,6 +3,7 @@ package context
 import (
 	"fmt"
 	"htestp/models"
+	"log"
 )
 
 var Storage = map[string]models.TypedVariable{}
@@ -61,4 +62,16 @@ func GetVariable(key string) *models.TypedVariable {
 		return &val
 	}
 	return nil
+}
+
+// removes every entry from the global context
+func PurgeContext() {
+	log.Print("WARNINIG: you are removing every entry from the global context!")
+
+	length := len(Storage)
+	for key, _ := range Storage {
+		delete(Storage, key)
+	}
+
+	log.Printf("WARNING: removed: %d from the global context, now the context is empty.", length)
 }
