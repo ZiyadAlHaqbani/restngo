@@ -18,8 +18,8 @@ func init() {
 // we use absolute file path to remove the potential of redundant loading of files
 // for example a user could load 'D:proj/json_load.json' and 'json_load.json', both containt the same
 // file but the cache key will be different.
-//
-//	for both reading and writing to the cache.
+
+// for both reading and writing to the cache.
 func FetchFileBytes(file_path string) ([]byte, error) {
 	defer sweep()
 
@@ -97,7 +97,7 @@ func UnloadFile(file_path string) error {
 	return fmt.Errorf("file path: %q doesn't exist in cache", abs_file_path)
 }
 
-// doesn't load files if not found in cache
+// returns error if the requested file isn't found in cache
 func GetFileBytesRaw(file_path string) ([]byte, error) {
 	defer sweep()
 
