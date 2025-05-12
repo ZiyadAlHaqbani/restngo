@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"htestp/dsl/parser"
 	"htestp/dsl/scanner"
-	"htestp/runner"
+	"htestp/runner/runner"
 	"net/http"
 )
 
