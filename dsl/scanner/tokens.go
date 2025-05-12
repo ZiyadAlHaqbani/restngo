@@ -52,6 +52,7 @@ var TokenTypeToString = map[TokenType]string{
 	URL:           "URL",
 	METHOD:        "METHOD",
 }
+
 // Map strings to specific token types
 var TypesMap = map[string]TokenType{
 	"StaticNode":      Node,
@@ -103,6 +104,6 @@ func (token Token) GetPlainString() string {
 		return temp
 	}
 
-	log.Fatalf("ERROR: GetPlainString() is only for stringliteral tokens")
+	log.Panicf("ERROR: GetPlainString() is only for stringliteral tokens")
 	return ""
 }

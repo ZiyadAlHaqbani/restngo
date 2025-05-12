@@ -20,9 +20,9 @@ func CreateParser(tokens []scanner.Token) *Parser {
 type Parser struct {
 	tokens  []scanner.Token
 	current int
-  
+
 	CURRENT_TOKEN scanner.Token
-	Head models.Node
+	Head          models.Node
 }
 
 func (parser *Parser) peek() scanner.Token {
@@ -54,7 +54,7 @@ func (parser *Parser) consume(t scanner.TokenType) scanner.Token {
 		return parser.advance()
 	}
 
-	log.Fatalf("ERROR: expected %s, but found: '%s'", scanner.TokenTypeToString[t], parser.peek().ToString())
+	log.Panicf("ERROR: expected %s, but found: '%s'", scanner.TokenTypeToString[t], parser.peek().ToString())
 	return scanner.Token{}
 }
 
@@ -70,10 +70,10 @@ func (parser *Parser) parseFunction() models.Node {
 	if scanner.TypesMap[parser.peek().Content] == scanner.Node {
 		return parser.parseNode()
 	} else if scanner.TypesMap[parser.peek().Content] == scanner.Constraint {
-		log.Fatal("ERROR: constraints must only be defined within nodes, and not outside of them")
+		log.Panic("ERROR: constraints must only be defined within nodes, and not outside of them")
 	}
 
-	log.Fatalf("ERROR: unrecognized identifier: %+v", parser.peek())
+	log.Panicf("ERROR: unrecognized identifier: %+v", parser.peek())
 	//_
 	return &nodes.ConditionalNode{}
 }
@@ -85,13 +85,13 @@ func (parser *Parser) parseNode() models.Node {
 	case "StaticNode":
 		return parser.parseStaticNode()
 	case "DynamicNode":
-		log.Fatal("ERROR: DynamicNode is not supported yet.")
+		log.Panic("ERROR: DynamicNode is not supported yet.")
 	default:
-		log.Fatalf("ERROR: unsupported node type: %q, at: %+v", id.Content, id)
+		log.Panicf("ERROR: unsupported node type: %q, at: %+v", id.Content, id)
 
 	}
 
-	log.Fatal("ERROR: check code!")
+	log.Panic("ERROR: check code!")
 	//_
 	return &nodes.ConditionalNode{}
 }
@@ -155,7 +155,6 @@ func (parser *Parser) parseConstraints() []models.Constraint {
 
 func (parser *Parser) parseConstraint() models.Constraint {
 
-
 	var toReturn models.Constraint
 
 	identifier := parser.advance()
@@ -166,7 +165,7 @@ func (parser *Parser) parseConstraint() models.Constraint {
 
 	expected, exists := scanner.DataTypesMap[parser.advance().Type]
 	if !exists {
-		log.Fatalf("ERROR: unrecognized type: %v", parser.advance().Type)
+		log.Panicf("ERROR: unrecognized type: %v", parser.advance().Type)
 	}
 
 	switch identifier.Content {
@@ -194,7 +193,7 @@ func (parser *Parser) parseConstraint() models.Constraint {
 			num := parser.consume(scanner.Number)
 			val, err := strconv.ParseFloat(num.Content, 64)
 			if err != nil {
-				log.Fatalf("ERROR: couldn't convert %q into a number: %+v", num.Content, err)
+				log.Panicf("ERROR: couldn't convert %q into a number: %+v", num.Content, err)
 			}
 			temp.Expected = val
 		case models.TypeString:
