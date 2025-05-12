@@ -15,7 +15,7 @@ func init() {
 	loadConfigs()
 }
 
-// we use absolute file path to remove the potential of redundant loading of files
+// we use absolute file paths as cache keys to remove the potential of redundant loading of files
 // for example a user could load 'D:proj/json_load.json' and 'json_load.json', both containt the same
 // file but the cache key will be different.
 
