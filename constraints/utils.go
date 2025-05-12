@@ -313,3 +313,71 @@ func checkType(value interface{}, data_type models.MatchType, field string) mode
 	}
 
 }
+
+func checkEquality(value interface{}, expected interface{}, field string) models.MatchStatus {
+
+	switch value.(type) {
+	case string:
+		_, expected_valid := expected.(string)
+		if !(expected_valid && value.(string) == expected.(string)) {
+			return models.MatchStatus{
+				Failed:  true,
+				Message: fmt.Sprintf("field: %s doesn't match expected value: %s", field, expected),
+			}
+		}
+
+	case float64:
+		_, expected_valid := expected.(float64)
+		if !(expected_valid && value.(float64) == expected.(float64)) {
+			return models.MatchStatus{
+				Failed:  true,
+				Message: fmt.Sprintf("field: %s doesn't match expected value: %s", field, expected),
+			}
+		}
+	case bool:
+		_, expected_valid := expected.(bool)
+		if !(expected_valid && value.(bool) == expected.(bool)) {
+			return models.MatchStatus{
+				Failed:  true,
+				Message: fmt.Sprintf("field: %s doesn't match expected value: %s", field, expected),
+			}
+		}
+	case []interface{}:
+		_, expected_valid := expected.([]interface{})
+		valid, msg := matchLists(value.([]interface{}), expected.([]interface{}))
+		if expected_valid {
+			return models.MatchStatus{
+				Failed:  !valid,
+				Message: msg,
+			}
+		}
+		return models.MatchStatus{
+			Failed:  true,
+			Message: fmt.Sprintf("field: %s doesn't match expected value: %s", field, expected),
+		}
+	case map[string]interface{}:
+		_, expected_valid := expected.(map[string]interface{})
+		valid, msg := matchMaps(value.(map[string]interface{}), expected.(map[string]interface{}))
+		if expected_valid {
+			return models.MatchStatus{
+				Failed:  !valid,
+				Message: msg,
+			}
+		}
+		return models.MatchStatus{
+			Failed:  true,
+			Message: fmt.Sprintf("field: %s doesn't match expected value: %s", field, expected),
+		}
+
+	default:
+		panic("ERROR: user assigned type outside of the defined types in 'MatchType'")
+
+	}
+
+	return models.MatchStatus{
+		Failed: false,
+		// Don't set MatchedType because it's not known
+		MatchedValue: value,
+	}
+
+}

@@ -5,7 +5,9 @@ import (
 	httphandler "htestp/http_handler"
 	"htestp/models"
 	nodes "htestp/nodes"
+	"htestp/runner/context"
 	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -17,7 +19,57 @@ type TestDynamicNode struct {
 }
 
 func TestExecuteDynamicnode(t *testing.T) {
-
+	t.Run("test correct query with expected response", func(t *testing.T) {
+		testNode := TestDynamicNode{
+			DynamicNode: &nodes.DynamicNode{
+				InnerNode: nodes.StaticNode{
+					Request: httphandler.Request{
+						Url:    "https://dummyjson.com/products",
+						Method: string(models.GET),
+					},
+				},
+			},
+		}
+		response, err := testNode.Execute(http.DefaultClient)
+		assert.Nil(t, err)
+		assert.Equal(t, 200, response.Status)
+	})
+	t.Run("test incorrect query with expected response", func(t *testing.T) {
+		testNode := TestDynamicNode{
+			DynamicNode: &nodes.DynamicNode{
+				InnerNode: nodes.StaticNode{
+					Request: httphandler.Request{
+						Url:    "https://dummyjson.com/doesntexist",
+						Method: string(models.GET),
+					},
+				},
+			},
+		}
+		response, err := testNode.Execute(http.DefaultClient)
+		assert.Nil(t, err)
+		assert.Equal(t, 404, response.Status)
+	})
+	t.Run("test use of context variables", func(t *testing.T) {
+		context.StoreVariable("q", "phone")
+		testNode := TestDynamicNode{
+			DynamicNode: &nodes.DynamicNode{
+				InnerNode: nodes.StaticNode{
+					Request: httphandler.Request{
+						Url:    "https://dummyjson.com/products/search",
+						Method: string(models.GET),
+					},
+				},
+				QueryBuilderFunc: func(storage *map[string]models.TypedVariable) url.Values {
+					searchProduct := (*storage)["q"].Value
+					return url.Values{"q": {searchProduct.(string)}}
+				},
+			},
+		}
+		response, err := testNode.Execute(http.DefaultClient)
+		assert.Nil(t, err)
+		assert.Equal(t, 200, response.Status)
+		assert.Equal(t, 101.0, response.Body.(map[string]interface{})["products"].([]interface{})[0].(map[string]interface{})["id"])
+	})
 }
 func TestGetNextNodes(t *testing.T) {
 	t.Run("Added multiple nodes should be returned exactly when using GetNextNodes", func(t *testing.T) {
@@ -93,7 +145,7 @@ func TestSuccessful(t *testing.T) {
 	t.Run("a successful constraint should make succesful function return true", func(t *testing.T) {
 		successfulBuilder := builder.CreateNewBuilder()
 		successfulBuilder.AddDynamicNodeId("1", "https://dummyjson.com/products", models.GET, nil, nil).
-			AddMatchConstraint("products[0].id", 1, models.TypeFloat)
+			AddMatchConstraint("products[0].id", 1.0, models.TypeFloat)
 		successfulBuilder.Run()
 		if !(*successfulBuilder.Nodes)["1"].Successful() {
 			t.Errorf("Expected %t got %t", true, false)

@@ -29,9 +29,12 @@ func (match *Match_Constraint) constrain(node models.Node) models.MatchStatus {
 			Message: msg}
 	}
 
-	status := checkType(result, match.Type, match.Field)
-	status.Failed_at_node = &node
-	return status
+	typeStatus := checkType(result, match.Type, match.Field)
+	if typeStatus.Failed {
+		return typeStatus
+	} else {
+		return checkEquality(result, match.Expected, match.Field)
+	}
 }
 
 func (match *Match_Constraint) ToString() string {
