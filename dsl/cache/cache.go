@@ -64,6 +64,11 @@ func LoadFile(file_path string) ([]byte, error) {
 
 	file_content, err := os.ReadFile(abs_file_path)
 	if err != nil {
+		meta := metadata[abs_file_path]
+		meta.LastMod = time.Now()
+		meta.TimesUsed++
+		meta.AccessTime = time.Now()
+		metadata[abs_file_path] = meta
 		return []byte{}, err
 	}
 

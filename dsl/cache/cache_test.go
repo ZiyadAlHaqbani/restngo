@@ -40,19 +40,19 @@ func TestUnloadFile(t *testing.T) {
 func TestSweepTTL(t *testing.T) {
 
 	_configs.SweepTriggerCount = 1
-	_configs.TTL = Duration(time.Microsecond * 10)
+	_configs.TTL = Duration(time.Millisecond * 10)
 	_configs.Strategy = "TTL"
 
 	//load files for the first time and generate metadata
 	FetchFileBytes("test_load.json")
 	FetchFileBytes("cache_config.json")
 
-	time.Sleep(time.Millisecond * 20)
+	time.Sleep(time.Millisecond * 10)
 
 	//activate sweep
 	FetchFileBytes("test_load.json")
 
 	if len(cache) > 0 {
-		t.Errorf("expected empty cache, got cache of size: %d", len(cache))
+		t.Errorf("expected empty cache, got cache of size: %+v", metadata)
 	}
 }
