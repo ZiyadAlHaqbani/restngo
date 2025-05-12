@@ -22,7 +22,7 @@ jobs:
     - name: Check for usage of fatal in source
       run: |
         set -e
-        if find -name "*.go" -exec grep -Hn "Fatal" {} + then
+        if find -name "*.go" -exec grep -Hn "Fatal" {} +; then
             echo "::error ::Found disallow Fatal*() calls"
             exit 1
         fi
