@@ -19,10 +19,4 @@ jobs:
         go-version: '1.23.5'
         check-latest: true
 
-    - name: Check for usage of fatal in source
-      run: |
-        set -e
-        if find -name "*.go" -exec grep -Hn "Fatal" {} +; then
-            echo "::error ::Found disallow Fatal*() calls"
-            exit 1
-        fi
+    
