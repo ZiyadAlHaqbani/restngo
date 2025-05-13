@@ -36,7 +36,7 @@ jobs:
     steps:
     - name: run cloc
       run: |
-        apt install cloc
+        sudo apt install cloc
         cloc . > cloc.txt
         echo #### > cloc.md
         echo '```' > cloc.md 
