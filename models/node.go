@@ -14,4 +14,5 @@ type Node interface {
 	GetNextNodes() []Node
 	ToString() string
 	Successful() bool
+	GetID() string
 }

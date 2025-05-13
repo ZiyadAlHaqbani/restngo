@@ -97,3 +97,7 @@ func (node *DynamicNode) Successful() bool {
 	// Returns the opposite of flag failed
 	return node.InnerNode.Successful()
 }
+
+func (node *DynamicNode) GetID() string {
+	return node.InnerNode.GetID()
+}
