@@ -8,6 +8,7 @@
 !LICENSE
 !go.sum
 !release_build.bat
+!cloc.md
 
 !constraints
 !constraints/**
