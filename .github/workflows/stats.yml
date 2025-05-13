@@ -1,0 +1,32 @@
+name: Stats
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  stats:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run cloc
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cloc
+          cloc . > cloc.txt
+          echo '####' > cloc.md
+          echo '```' >> cloc.md 
+          cat cloc.txt >> cloc.md
+          echo '```' >> cloc.md
+
+      - name: Push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add cloc.md
+          git commit -m "updating cloc output [ci skip]" || echo 'no changes'
+          git push origin HEAD:${GITHUB_HEAD_REF}
