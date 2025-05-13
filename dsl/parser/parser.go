@@ -26,6 +26,9 @@ type Parser struct {
 }
 
 func (parser *Parser) peek() scanner.Token {
+	if parser.current >= len(parser.tokens) {
+		return scanner.Token{Type: scanner.EOF}
+	}
 	parser.CURRENT_TOKEN = parser.tokens[parser.current]
 	return parser.tokens[parser.current]
 }
