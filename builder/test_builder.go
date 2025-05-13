@@ -51,13 +51,13 @@ func (builder *TestBuilder) AddStaticNodeId(id string, url string, method models
 		request.Body = nil
 	}
 
-	new := &nodes.StaticNode{Request: request}
+	new := &nodes.StaticNode{Request: request, ID: id}
+	(*builder.Nodes)[id] = new
 	if builder.head == nil {
 		builder.head = new
 		builder.current = builder.head
 		return builder
 	}
-	(*builder.Nodes)[id] = new
 
 	builder.current.AddNode(new)
 	builder.current = new
@@ -75,13 +75,13 @@ func (builder *TestBuilder) AddStaticNodeRawId(id string, request httphandler.Re
 		return builder
 	}
 
-	new := &nodes.StaticNode{Request: request}
+	new := &nodes.StaticNode{Request: request, ID: id}
+	(*builder.Nodes)[id] = new
 	if builder.head == nil {
 		builder.head = new
 		builder.current = builder.head
 		return builder
 	}
-	(*builder.Nodes)[id] = new
 
 	builder.current.AddNode(new)
 	builder.current = new
@@ -110,10 +110,13 @@ func (builder *TestBuilder) AddDynamicNodeId(id string, url string, method model
 	}
 
 	new := &nodes.DynamicNode{
-		InnerNode: nodes.StaticNode{Request: httphandler.Request{
-			Url:    url,
-			Method: string(method),
-		}},
+		InnerNode: nodes.StaticNode{
+			Request: httphandler.Request{
+				Url:    url,
+				Method: string(method),
+			},
+			ID: id,
+		},
 		QueryBuilderFunc: queryBuilder,
 		BodyBuilderFunc:  bodyBuilder,
 	}
@@ -136,7 +139,7 @@ func (builder *TestBuilder) AddDynamicNodeRawId(id string, request httphandler.R
 	}
 
 	new := &nodes.DynamicNode{
-		InnerNode:        nodes.StaticNode{Request: request},
+		InnerNode:        nodes.StaticNode{Request: request, ID: id},
 		QueryBuilderFunc: queryBuilder,
 		BodyBuilderFunc:  bodyBuilder,
 	}
@@ -154,6 +157,167 @@ func (builder *TestBuilder) AddDynamicNodeRawId(id string, request httphandler.R
 func (builder *TestBuilder) AddDynamicNodeRaw(request httphandler.Request, queryBuilder func(*map[string]models.TypedVariable) url.Values, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
 	id := strconv.Itoa(len(*builder.Nodes))
 	return builder.AddDynamicNodeRawId(id, request, queryBuilder, bodyBuilder)
+}
+
+// AddChildDynamicNode creates a new DynamicNode with the given ID and adds it as a child of the specified parent node.
+// The new node will have a URL and HTTP method specified, along with optional query and body builder functions.
+//
+// Parameters:
+//   - newID: Unique identifier for the new node
+//   - parentID: ID of the existing parent node to attach to
+//   - url: The URL endpoint for the request
+//   - method: HTTP method (GET, POST, etc) for the request from models.HTTPMethod
+//   - queryBuilder: Optional function to build URL query parameters using context variables
+//   - bodyBuilder: Optional function to build request body using context variables
+//
+// Returns:
+//   - *TestBuilder: Returns the builder instance of the current builder for method chaining
+//
+// The method will panic if:
+//   - A node with newID already exists
+//   - The specified parentID does not exist
+func (builder *TestBuilder) AddChildDynamicNode(newID string, parentID string, url string, method models.HTTPMethod, queryBuilder func(*map[string]models.TypedVariable) url.Values, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
+	if _, exists := (*builder.Nodes)[newID]; exists {
+		log.Panicf("ERROR: node with id : %q already exists!", newID)
+		return builder
+	}
+	if _, exists := (*builder.Nodes)[parentID]; !exists {
+		log.Panicf("ERROR: parent node with id : %q does not exist!", parentID)
+		return builder
+	}
+
+	new := &nodes.DynamicNode{
+		InnerNode: nodes.StaticNode{
+			Request: httphandler.Request{
+				Url:    url,
+				Method: string(method),
+			},
+			ID: newID,
+		},
+		QueryBuilderFunc: queryBuilder,
+		BodyBuilderFunc:  bodyBuilder,
+	}
+	(*builder.Nodes)[newID] = new
+
+	(*builder.Nodes)[parentID].AddNode(new)
+
+	return builder
+}
+
+// AddChildDynamicNodeRaw creates a new DynamicNode with the given ID and adds it as a child of the specified parent node.
+// The new node will use a raw Request object along with optional query and body builder functions.
+//
+// Parameters:
+//   - newID: Unique identifier for the new node
+//   - parentID: ID of the existing parent node to attach to
+//   - request: Raw Request object containing URL, method, and other request details
+//   - queryBuilder: Optional function to build URL query parameters using context variables
+//   - bodyBuilder: Optional function to build request body using context variables
+//
+// Returns:
+//   - *TestBuilder: Returns the builder instance of the current builder for method chaining
+//
+// The method will panic if:
+//   - A node with newID already exists
+//   - The specified parentID does not exist
+
+func (builder *TestBuilder) AddChildDynamicNodeRaw(newID string, parentID string, request httphandler.Request, queryBuilder func(*map[string]models.TypedVariable) url.Values, bodyBuilder func(*map[string]models.TypedVariable) map[string]interface{}) *TestBuilder {
+	if _, exists := (*builder.Nodes)[newID]; exists {
+		log.Panicf("ERROR: node with id : %q already exists!", newID)
+		return builder
+	}
+	if _, exists := (*builder.Nodes)[parentID]; !exists {
+		log.Panicf("ERROR: parent node with id : %q does not exist!", parentID)
+		return builder
+	}
+
+	new := &nodes.DynamicNode{
+		InnerNode:        nodes.StaticNode{Request: request, ID: newID},
+		QueryBuilderFunc: queryBuilder,
+		BodyBuilderFunc:  bodyBuilder,
+	}
+	(*builder.Nodes)[newID] = new
+
+	(*builder.Nodes)[parentID].AddNode(new)
+
+	return builder
+}
+
+// AddChildStaticNode creates a new StaticNode with the given ID and adds it as a child of the specified parent node.
+// The new node will be constructed using the provided URL, HTTP method and optional request body.
+//
+// Parameters:
+//   - newID: Unique identifier for the new node
+//   - parentID: ID of the existing parent node to attach to
+//   - url: The URL endpoint for the request
+//   - method: HTTP method to use (GET, POST, etc) from models.HTTPMethod
+//   - body: Optional request body as a bytes.Buffer
+//
+// Returns:
+//   - *TestBuilder: Returns the builder instance of the current builder for method chaining
+//
+// The method will panic if:
+//   - A node with newID already exists
+//   - The specified parentID does not exist
+
+func (builder *TestBuilder) AddChildStaticNode(newID string, parentID string, url string, method models.HTTPMethod, body *bytes.Buffer) *TestBuilder {
+	if _, exists := (*builder.Nodes)[newID]; exists {
+		log.Panicf("ERROR: node with id : %q already exists!", newID)
+		return builder
+	}
+	if _, exists := (*builder.Nodes)[parentID]; !exists {
+		log.Panicf("ERROR: parent node with id : %q does not exist!", parentID)
+		return builder
+	}
+
+	request := httphandler.Request{
+		Url:    url,
+		Method: string(method),
+	}
+
+	if body != nil {
+		request.Body = body
+	}
+
+	new := &nodes.StaticNode{Request: request, ID: newID}
+	(*builder.Nodes)[newID] = new
+
+	(*builder.Nodes)[parentID].AddNode(new)
+
+	return builder
+}
+
+// AddChildStaticNodeRaw creates a new StaticNode with the given ID and adds it as a child of the specified parent node.
+// Unlike AddChildStaticNode, this method takes a pre-constructed httphandler.Request object directly.
+//
+// Parameters:
+//   - newID: Unique identifier for the new node
+//   - parentID: ID of the existing parent node to attach to
+//   - request: Pre-constructed httphandler.Request containing URL, method and optional body
+//
+// Returns:
+//   - *TestBuilder: Returns the builder instance of the current builder for method chaining
+//
+// The method will panic if:
+//   - A node with newID already exists
+//   - The specified parentID does not exist
+
+func (builder *TestBuilder) AddChildStaticNodeRaw(newID string, parentID string, request httphandler.Request) *TestBuilder {
+	if _, exists := (*builder.Nodes)[newID]; exists {
+		log.Panicf("ERROR: node with id : %q already exists!", newID)
+		return builder
+	}
+	if _, exists := (*builder.Nodes)[parentID]; !exists {
+		log.Panicf("ERROR: parent node with id : %q does not exist!", parentID)
+		return builder
+	}
+
+	new := &nodes.StaticNode{Request: request, ID: newID}
+	(*builder.Nodes)[newID] = new
+
+	(*builder.Nodes)[parentID].AddNode(new)
+
+	return builder
 }
 
 // WARNING: this is a dangerous function that shouldn't be used in most cases, it sets the current node of the caller

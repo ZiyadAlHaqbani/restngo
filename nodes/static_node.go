@@ -8,6 +8,7 @@ import (
 )
 
 type StaticNode struct {
+	ID          string
 	Next        []models.Node
 	Request     httphandler.Request
 	Response    httphandler.HTTPResponse
@@ -54,7 +55,7 @@ func (node *StaticNode) GetNextNodes() []models.Node {
 }
 
 func (node *StaticNode) ToString() string {
-	temp := fmt.Sprintf("%s_%s", node.Request.Method, node.Request.Url)
+	temp := fmt.Sprintf("ID: %s, %s_%s", node.ID, node.Request.Method, node.Request.Url)
 
 	if len(node.Constraints) > 0 {
 		temp += " {"
@@ -71,4 +72,8 @@ func (node *StaticNode) ToString() string {
 
 func (node *StaticNode) Successful() bool {
 	return !node.Failed
+}
+
+func (node *StaticNode) GetID() string {
+	return node.ID
 }
