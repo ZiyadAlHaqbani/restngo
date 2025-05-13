@@ -109,3 +109,6 @@ builder.SetBranchTo(branch3)
 ```
 
 [![Go](https://github.com/ZiyadHQ/H_TesT_P/actions/workflows/go.yml/badge.svg?branch=main&event=check_suite)](https://github.com/ZiyadHQ/H_TesT_P/actions/workflows/go.yml)
+
+#cloc output:
+See [cloc.md](./cloc.md) updated line counts after every merge into main
