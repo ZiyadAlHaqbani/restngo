@@ -17,6 +17,7 @@ import (
 
 type MockNode struct {
 	ShouldSucceed bool
+	ID            string
 }
 
 func (node *MockNode) Execute(client *http.Client) (httphandler.HTTPResponse, error) {
@@ -51,4 +52,8 @@ func (node *MockNode) ToString() string {
 
 func (node *MockNode) Successful() bool {
 	return node.ShouldSucceed
+}
+
+func (node *MockNode) GetID() string {
+	return node.ID
 }
