@@ -10,6 +10,7 @@ import (
 // TODO:	find a way to integrate this node into test_builder, most
 // TODO:	likely through a seperate conditionalNodeBuilder?
 type ConditionalNode struct {
+	ID        string
 	TrueNode  models.Node //	if the callback return true, this node will run.
 	FalseNode models.Node //	if the callback return false, this node will run.
 
@@ -89,6 +90,7 @@ func (node *ConditionalNode) Successful() bool {
 	return node.Failed
 }
 
+
 func (node *ConditionalNode) GetConstraints() []models.Constraint {
 	return node.Constraints
 }
@@ -121,3 +123,8 @@ func (node *ConditionalNode) SetNextNodes(next []models.Node) {
 
 // GetNextNodes() []Node
 // SetNextNodes([]Node)
+
+func (node *ConditionalNode) GetID() string {
+	return node.ID
+}
+

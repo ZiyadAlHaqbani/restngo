@@ -17,6 +17,7 @@ import (
 
 type MockNode struct {
 	ShouldSucceed bool
+	ID            string
 }
 
 func (node *MockNode) Execute(client *http.Client) (httphandler.HTTPResponse, error) {
@@ -68,4 +69,9 @@ func (node *MockNode) GetNextNodes() []models.Node {
 }
 
 func (node *MockNode) SetNextNodes(next []models.Node) {
+  node.Next = next
+}
+
+func (node *MockNode) GetID() string {
+	return node.ID
 }

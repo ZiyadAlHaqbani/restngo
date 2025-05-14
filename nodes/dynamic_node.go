@@ -93,6 +93,7 @@ func (node *DynamicNode) Successful() bool {
 	return node.InnerNode.Successful()
 }
 
+
 func (node *DynamicNode) GetConstraints() []models.Constraint {
 	return node.InnerNode.Constraints
 }
@@ -125,3 +126,8 @@ func (node *DynamicNode) SetNextNodes(next []models.Node) {
 
 // GetNextNodes() []Node
 // SetNextNodes([]Node)
+
+func (node *DynamicNode) GetID() string {
+	return node.InnerNode.GetID()
+}
+

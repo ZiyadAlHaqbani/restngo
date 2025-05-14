@@ -13,7 +13,8 @@ type Node interface {
 	AddNode(Node)
 	ToString() string
 	Successful() bool
-
+  GetID() string
+  
 	// getters and setters(makes behavior too OOP like, but essential to fix some issues)
 	GetConstraints() []Constraint
 	SetConstraints([]Constraint)
@@ -23,4 +24,7 @@ type Node interface {
 
 	GetNextNodes() []Node
 	SetNextNodes([]Node)
+
+	
+
 }
