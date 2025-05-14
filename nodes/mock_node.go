@@ -69,7 +69,6 @@ func (node *MockNode) GetNextNodes() []models.Node {
 }
 
 func (node *MockNode) SetNextNodes(next []models.Node) {
-  node.Next = next
 }
 
 func (node *MockNode) GetID() string {
