@@ -178,10 +178,14 @@ func (parser *Parser) parseConstraint() models.Constraint {
 			Type:  expected,
 		}
 	case "ExistStoreConstraint":
+		parser.consume(scanner.Comma)
 		varname := parser.consume(scanner.StringLiteral)
 		toReturn = &constraints.Exist_Store_Constraint{
-			InnerConstraint: constraints.Exist_Constraint{},
-			Varname:         varname.Content,
+			InnerConstraint: constraints.Exist_Constraint{
+				Field: field.Content,
+				Type:  expected,
+			},
+			Varname: varname.Content,
 		}
 	case "MatchConstraint":
 		temp := constraints.Match_Constraint{
@@ -212,6 +216,7 @@ func (parser *Parser) parseConstraint() models.Constraint {
 		}
 	}
 
+	parser.match(scanner.Comma) // able to leave a trailing ',' in constraint calls
 	parser.consume(scanner.RightParen)
 	parser.match(scanner.Comma)
 

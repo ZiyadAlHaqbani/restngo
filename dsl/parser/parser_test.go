@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"htestp/constraints"
 	"htestp/dsl/scanner"
 	"htestp/nodes"
 	"testing"
@@ -62,7 +63,7 @@ func TestParse(t *testing.T) {
 
 }
 
-func TestParseConstraint(t *testing.T) {
+func TestParseExistConstraint(t *testing.T) {
 
 	success_tokens := []scanner.Token{
 		{Type: scanner.Constraint, Content: "ExistConstraint"},
@@ -76,4 +77,61 @@ func TestParseConstraint(t *testing.T) {
 	successful := CreateParser(success_tokens)
 	successful.parseConstraint()
 
+	fail_tokens := []scanner.Token{
+		{Type: scanner.Constraint, Content: "ExistStoreConstraint"},
+		{Type: scanner.LeftParen, Content: "("},
+		{Type: scanner.StringLiteral, Content: "test.field[12]"},
+		{Type: scanner.Comma, Content: ","},
+		{Type: scanner.Float64, Content: "FLOAT64"},
+
+		{Type: scanner.RightParen, Content: ")"},
+	}
+
+	failed := CreateParser(fail_tokens)
+	assert.Panics(t, func() { failed.parseConstraint() }, "expected parser to panic")
+
+}
+
+func TestParseExistStoreConstraint(t *testing.T) {
+
+	success_tokens := []scanner.Token{
+		{Type: scanner.Constraint, Content: "ExistStoreConstraint"},
+		{Type: scanner.LeftParen, Content: "("},
+		{Type: scanner.StringLiteral, Content: "test.field[12]"},
+		{Type: scanner.Comma, Content: ","},
+		{Type: scanner.Float64, Content: "FLOAT64"},
+		{Type: scanner.Comma, Content: ","},
+		{Type: scanner.StringLiteral, Content: "test_varname"},
+		{Type: scanner.RightParen, Content: ")"},
+	}
+	_ = success_tokens
+	successful := CreateParser(success_tokens)
+	successful_constraint := successful.parseConstraint()
+	var expected *constraints.Exist_Store_Constraint
+	assert.IsType(t, expected, successful_constraint, "expected Exist_Store_Constraint")
+
+	fail_tokens := []scanner.Token{
+		{Type: scanner.Constraint, Content: "ExistStoreConstraint"},
+		{Type: scanner.LeftParen, Content: "("},
+		{Type: scanner.StringLiteral, Content: "test.field[12]"},
+		{Type: scanner.Comma, Content: ","},
+		{Type: scanner.Float64, Content: "FLOAT64"},
+		// {Type: scanner.Comma, Content: ","}, removed a comma after the type
+		{Type: scanner.StringLiteral, Content: "test_varname"},
+		{Type: scanner.RightParen, Content: ")"},
+	}
+
+	failed := CreateParser(fail_tokens)
+	assert.Panics(t, func() { failed.parseConstraint() }, "expected parser to panic")
+
+}
+
+func TestParseMatchConstraint(t *testing.T) {
+	//TODO: implement match in the parser first
+	t.SkipNow()
+}
+
+func TestParseMatchStoreConstraint(t *testing.T) {
+	//TODO: implement match in the parser first
+	t.SkipNow()
 }
