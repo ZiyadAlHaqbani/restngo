@@ -77,11 +77,6 @@ func (node *DynamicNode) AddConstraint(constraint models.Constraint) {
 	node.InnerNode.AddConstraint(constraint)
 }
 
-func (node *DynamicNode) GetNextNodes() []models.Node {
-
-	return node.Next
-}
-
 func (node *DynamicNode) AddNode(new models.Node) {
 
 	node.Next = append(node.Next, new)
@@ -97,3 +92,36 @@ func (node *DynamicNode) Successful() bool {
 	// Returns the opposite of flag failed
 	return node.InnerNode.Successful()
 }
+
+func (node *DynamicNode) GetConstraints() []models.Constraint {
+	return node.InnerNode.Constraints
+}
+
+func (node *DynamicNode) SetConstraints(constraints []models.Constraint) {
+	node.InnerNode.Constraints = constraints
+}
+
+func (node *DynamicNode) GetRequest() httphandler.Request {
+	return node.InnerNode.Request
+}
+
+func (node *DynamicNode) SetRequest(request httphandler.Request) {
+	node.InnerNode.Request = request
+}
+
+func (node *DynamicNode) GetNextNodes() []models.Node {
+	return node.Next
+}
+
+func (node *DynamicNode) SetNextNodes(next []models.Node) {
+	node.Next = next
+}
+
+// GetConstraints() []Constraint
+// SetConstraints([]Constraint)
+
+// GetRequest() httphandler.Request
+// SetRequest(httphandler.Request)
+
+// GetNextNodes() []Node
+// SetNextNodes([]Node)

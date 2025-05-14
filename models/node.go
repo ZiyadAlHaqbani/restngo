@@ -18,8 +18,8 @@ type Node interface {
 	GetConstraints() []Constraint
 	SetConstraints([]Constraint)
 
-	GetRequest()
-	SetRequest() httphandler.Request
+	GetRequest() httphandler.Request
+	SetRequest(httphandler.Request)
 
 	GetNextNodes() []Node
 	SetNextNodes([]Node)

@@ -41,14 +41,31 @@ func (node *MockNode) AddNode(n models.Node) {
 
 }
 
-func (node *MockNode) GetNextNodes() []models.Node {
-	return []models.Node{}
-}
-
 func (node *MockNode) ToString() string {
 	return "mockNode"
 }
 
 func (node *MockNode) Successful() bool {
 	return node.ShouldSucceed
+}
+
+func (node *MockNode) GetConstraints() []models.Constraint {
+	return nil
+}
+
+func (node *MockNode) SetConstraints(constraints []models.Constraint) {
+}
+
+func (node *MockNode) GetRequest() httphandler.Request {
+	return httphandler.Request{}
+}
+
+func (node *MockNode) SetRequest(request httphandler.Request) {
+}
+
+func (node *MockNode) GetNextNodes() []models.Node {
+	return []models.Node{}
+}
+
+func (node *MockNode) SetNextNodes(next []models.Node) {
 }
