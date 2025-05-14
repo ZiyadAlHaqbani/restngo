@@ -71,11 +71,13 @@ func TestParseExistConstraint(t *testing.T) {
 		{Type: scanner.StringLiteral, Content: "test.field[12]"},
 		{Type: scanner.Comma, Content: ","},
 		{Type: scanner.Float64, Content: "FLOAT64"},
+		{Type: scanner.Comma, Content: ","},
 		{Type: scanner.RightParen, Content: ")"},
 	}
 	_ = success_tokens
 	successful := CreateParser(success_tokens)
-	successful.parseConstraint()
+	var expected *constraints.Exist_Constraint
+	assert.IsType(t, expected, successful.parseConstraint(), "expected constraints.Exist_Constraint")
 
 	fail_tokens := []scanner.Token{
 		{Type: scanner.Constraint, Content: "ExistStoreConstraint"},
@@ -83,7 +85,9 @@ func TestParseExistConstraint(t *testing.T) {
 		{Type: scanner.StringLiteral, Content: "test.field[12]"},
 		{Type: scanner.Comma, Content: ","},
 		{Type: scanner.Float64, Content: "FLOAT64"},
-
+		// {Type: scanner.Comma, Content: ","},	// no comma between args
+		{Type: scanner.StringLiteral, Content: "varname"},
+		{Type: scanner.Comma, Content: ","},
 		{Type: scanner.RightParen, Content: ")"},
 	}
 

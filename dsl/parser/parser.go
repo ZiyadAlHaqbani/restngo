@@ -188,6 +188,7 @@ func (parser *Parser) parseConstraint() models.Constraint {
 			Varname: varname.Content,
 		}
 	case "MatchConstraint":
+		log.Panicf("MatchStoreConstraint is not supported yet")
 		temp := constraints.Match_Constraint{
 			Field:    field.Content,
 			Type:     expected,
@@ -208,7 +209,9 @@ func (parser *Parser) parseConstraint() models.Constraint {
 			temp.Expected = expected_val.Content
 		}
 		toReturn = &temp
+
 	case "MatchStoreConstraint":
+		log.Panicf("MatchStoreConstraint is not supported yet")
 		varname := parser.consume(scanner.StringLiteral)
 		toReturn = &constraints.Exist_Store_Constraint{
 			InnerConstraint: constraints.Exist_Constraint{},
