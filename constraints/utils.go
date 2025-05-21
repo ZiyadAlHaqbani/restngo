@@ -125,15 +125,36 @@ func matchMaps(a map[string]interface{}, b map[string]interface{}) (bool, string
 }
 
 func partialTraverse(subfield string, obj interface{}) (interface{}, string) {
-	return nil, "ERROR: implement the function"
+
+	traversals, _ := parseJSONPath(subfield)
+
+	temp_obj := obj
+
+	temp_obj, err_message := _traverse(traversals, temp_obj)
+	if temp_obj == nil {
+		unwrapped_obj, valid := obj.(map[string]interface{})
+		if !valid {
+
+		}
+		objects_queue := models.NewQueue[map[string]interface{}]()
+	}
+
+	return temp_obj, ""
 }
 
 func traverse(field string, obj interface{}) (interface{}, string) {
 
 	var traversals []models.Traversal
 
-	traversals, found := parseJSONPath(field)
-	if !found {
+	traversals, _ = parseJSONPath(field)
+
+	return _traverse(traversals, obj)
+
+}
+
+func _traverse(traversals []models.Traversal, obj interface{}) (interface{}, string) {
+
+	if len(traversals) == 0 {
 		fmt.Printf("Traversals: %+v\n\n", traversals)
 		log.Printf("WARNING: detected a constraint with empty field, are you sure you didn't forget to specify a field for the constraint?")
 		log.Printf("WARNING: since no field was specified, following object will be returned: %.100s...", fmt.Sprintf("%+v", obj)) //	solution to golang quirk with '%+v'
