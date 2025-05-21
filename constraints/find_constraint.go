@@ -14,7 +14,21 @@ type Find_Constraint struct {
 }
 
 func (constraint *Find_Constraint) Constrain(node models.Node) models.MatchStatus {
-	return models.MatchStatus{}
+
+	obj, err_message := partialTraverse(constraint.Field, node.GetResp().Body)
+	if obj == nil {
+		return models.MatchStatus{
+			Failed:         true,
+			Message:        err_message,
+			Failed_at_node: &node,
+		}
+	}
+
+	return models.MatchStatus{
+		Failed:       false,
+		MatchedValue: obj,
+		ValueType:    constraint.Type,
+	}
 }
 
 func (constraint *Find_Constraint) ToString() string {

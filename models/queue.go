@@ -21,3 +21,7 @@ func (q *queue[T]) Dequeue() T {
 	q.list = q.list[1:]
 	return temp
 }
+
+func (q *queue[T]) Len() int {
+	return len(q.list)
+}

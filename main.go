@@ -2,27 +2,18 @@ package main
 
 import (
 	"fmt"
-	"htestp/dsl/parser"
-	"htestp/dsl/scanner"
-	"htestp/runner/runner"
-	"net/http"
+	"htestp/builder"
+	"htestp/models"
 )
 
 func main() {
 
-	source :=
-		`
-StaticNode("ID:123432", GET, "https://github.com", ExistConstraint("ID.users.name", STRING), ExistConstraint("Users", ARRAY),
-	StaticNode("ID:123432", GET, "https://github.com", ExistConstraint("ID.users.name", STRING)), StaticNode("ID:123432", GET, "https://github.com", ExistConstraint("ID.users.name", STRING))
-)
-`
+	builder := builder.CreateNewBuilder()
 
-	s := scanner.CreateScanner(source)
-	p := parser.CreateParser(s.Scan())
-	p.Parse()
+	builder.AddStaticNode("https://httpbin.org/json", models.GET, nil).
+		AddFindConstraint("name", models.TypeString)
 
-	runner.RunHelper(http.DefaultClient, p.Head)
-
+	builder.Run()
 	fmt.Printf("END!")
 
 	//program end

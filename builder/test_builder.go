@@ -379,6 +379,15 @@ func (builder *TestBuilder) AddDynamicNodeBranch(url string, method models.HTTPM
 	return &branchBuilder
 }
 
+func (builder *TestBuilder) AddFindConstraint(field string, expectedType models.MatchType) *TestBuilder {
+	constraint := constraints.Find_Constraint{
+		Field: field,
+		Type:  expectedType,
+	}
+	builder.current.AddConstraint(&constraint)
+	return builder
+}
+
 func (builder *TestBuilder) AddMatchConstraint(field string, expectedValue interface{}, expectedType models.MatchType) *TestBuilder {
 	constraint := constraints.Match_Constraint{
 		Field:    field,

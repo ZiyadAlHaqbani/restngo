@@ -134,12 +134,39 @@ func partialTraverse(subfield string, obj interface{}) (interface{}, string) {
 	if temp_obj == nil {
 		unwrapped_obj, valid := obj.(map[string]interface{})
 		if !valid {
-
+			return nil, fmt.Sprintf("couldn't traverse object: %v as its not a JSON object", obj)
 		}
 		objects_queue := models.NewQueue[map[string]interface{}]()
+
+		for _, value := range unwrapped_obj {
+			if v, valid := value.(map[string]interface{}); valid {
+				objects_queue.Enqueue(v)
+			}
+		}
+
+		for objects_queue.Len() > 0 {
+			temp_obj = objects_queue.Dequeue()
+			if obj, err_message := _traverse(traversals, temp_obj); obj != nil {
+				return obj, err_message
+			} else {
+				unwrapped_obj, valid := obj.(map[string]interface{})
+				if !valid {
+					continue
+				}
+
+				for _, value := range unwrapped_obj {
+					if v, valid := value.(map[string]interface{}); valid {
+						objects_queue.Enqueue(v)
+					}
+				}
+
+			}
+		}
+
+		return nil, "TODO: error message when no partial field match found"
 	}
 
-	return temp_obj, ""
+	return temp_obj, err_message
 }
 
 func traverse(field string, obj interface{}) (interface{}, string) {
