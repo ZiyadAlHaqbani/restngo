@@ -124,6 +124,10 @@ func matchMaps(a map[string]interface{}, b map[string]interface{}) (bool, string
 	return true, ""
 }
 
+func partialTraverse(subfield string, obj interface{}) (interface{}, string) {
+	return nil, "ERROR: implement the function"
+}
+
 func traverse(field string, obj interface{}) (interface{}, string) {
 
 	var traversals []models.Traversal

@@ -15,7 +15,7 @@ func main() {
 StaticNode("ID:123432", GET, "https://github.com", ExistConstraint("ID.users.name", STRING), ExistConstraint("Users", ARRAY),
 	StaticNode("ID:123432", GET, "https://github.com", ExistConstraint("ID.users.name", STRING)), StaticNode("ID:123432", GET, "https://github.com", ExistConstraint("ID.users.name", STRING))
 )
-		`
+`
 
 	s := scanner.CreateScanner(source)
 	p := parser.CreateParser(s.Scan())
