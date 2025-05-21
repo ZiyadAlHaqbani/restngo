@@ -50,10 +50,6 @@ func (node *StaticNode) AddNode(new models.Node) {
 	node.Next = append(node.Next, new)
 }
 
-func (node *StaticNode) GetNextNodes() []models.Node {
-	return node.Next
-}
-
 func (node *StaticNode) ToString() string {
 	temp := fmt.Sprintf("ID: %s, %s_%s", node.ID, node.Request.Method, node.Request.Url)
 
@@ -74,6 +70,31 @@ func (node *StaticNode) Successful() bool {
 	return !node.Failed
 }
 
+
+func (node *StaticNode) GetConstraints() []models.Constraint {
+	return node.Constraints
+}
+
+func (node *StaticNode) SetConstraints(constraints []models.Constraint) {
+	node.Constraints = constraints
+}
+
+func (node *StaticNode) GetRequest() httphandler.Request {
+	return node.Request
+}
+
+func (node *StaticNode) SetRequest(request httphandler.Request) {
+	node.Request = request
+}
+
+func (node *StaticNode) GetNextNodes() []models.Node {
+	return node.Next
+}
+
+func (node *StaticNode) SetNextNodes(next []models.Node) {
+	node.Next = next
+}
+  
 func (node *StaticNode) GetID() string {
 	return node.ID
 }

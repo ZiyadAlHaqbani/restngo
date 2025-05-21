@@ -73,10 +73,6 @@ func (node *ConditionalNode) AddNode(new models.Node) {
 	node.Next = append(node.Next, new)
 }
 
-func (node *ConditionalNode) GetNextNodes() []models.Node {
-	return node.Next
-}
-
 func (node *ConditionalNode) ToString() string {
 
 	temp := "ConditionalNode:"
@@ -94,6 +90,41 @@ func (node *ConditionalNode) Successful() bool {
 	return node.Failed
 }
 
+
+func (node *ConditionalNode) GetConstraints() []models.Constraint {
+	return node.Constraints
+}
+
+func (node *ConditionalNode) SetConstraints(constraints []models.Constraint) {
+	node.Constraints = constraints
+}
+
+func (node *ConditionalNode) GetRequest() httphandler.Request {
+	panic("TODO: implement GetRequest")
+}
+
+func (node *ConditionalNode) SetRequest(request httphandler.Request) {
+	panic("TODO: implement SetRequest")
+}
+
+func (node *ConditionalNode) GetNextNodes() []models.Node {
+	return node.Next
+}
+
+func (node *ConditionalNode) SetNextNodes(next []models.Node) {
+	node.Next = next
+}
+
+// GetConstraints() []Constraint
+// SetConstraints([]Constraint)
+
+// GetRequest() httphandler.Request
+// SetRequest(httphandler.Request)
+
+// GetNextNodes() []Node
+// SetNextNodes([]Node)
+
 func (node *ConditionalNode) GetID() string {
 	return node.ID
 }
+

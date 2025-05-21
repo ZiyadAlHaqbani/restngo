@@ -11,8 +11,20 @@ type Node interface {
 	GetResp() httphandler.HTTPResponse
 	AddConstraint(Constraint)
 	AddNode(Node)
-	GetNextNodes() []Node
 	ToString() string
 	Successful() bool
-	GetID() string
+  GetID() string
+  
+	// getters and setters(makes behavior too OOP like, but essential to fix some issues)
+	GetConstraints() []Constraint
+	SetConstraints([]Constraint)
+
+	GetRequest() httphandler.Request
+	SetRequest(httphandler.Request)
+
+	GetNextNodes() []Node
+	SetNextNodes([]Node)
+
+	
+
 }
