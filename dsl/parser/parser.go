@@ -26,6 +26,9 @@ type Parser struct {
 }
 
 func (parser *Parser) peek() scanner.Token {
+	if parser.current >= len(parser.tokens) {
+		return scanner.Token{Type: scanner.EOF}
+	}
 	parser.CURRENT_TOKEN = parser.tokens[parser.current]
 	return parser.tokens[parser.current]
 }
@@ -175,12 +178,17 @@ func (parser *Parser) parseConstraint() models.Constraint {
 			Type:  expected,
 		}
 	case "ExistStoreConstraint":
+		parser.consume(scanner.Comma)
 		varname := parser.consume(scanner.StringLiteral)
 		toReturn = &constraints.Exist_Store_Constraint{
-			InnerConstraint: constraints.Exist_Constraint{},
-			Varname:         varname.Content,
+			InnerConstraint: constraints.Exist_Constraint{
+				Field: field.Content,
+				Type:  expected,
+			},
+			Varname: varname.Content,
 		}
 	case "MatchConstraint":
+		log.Panicf("MatchStoreConstraint is not supported yet")
 		temp := constraints.Match_Constraint{
 			Field:    field.Content,
 			Type:     expected,
@@ -201,7 +209,9 @@ func (parser *Parser) parseConstraint() models.Constraint {
 			temp.Expected = expected_val.Content
 		}
 		toReturn = &temp
+
 	case "MatchStoreConstraint":
+		log.Panicf("MatchStoreConstraint is not supported yet")
 		varname := parser.consume(scanner.StringLiteral)
 		toReturn = &constraints.Exist_Store_Constraint{
 			InnerConstraint: constraints.Exist_Constraint{},
@@ -209,6 +219,7 @@ func (parser *Parser) parseConstraint() models.Constraint {
 		}
 	}
 
+	parser.match(scanner.Comma) // able to leave a trailing ',' in constraint calls
 	parser.consume(scanner.RightParen)
 	parser.match(scanner.Comma)
 
