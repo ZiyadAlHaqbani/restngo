@@ -169,9 +169,6 @@ func partialTraverse(subfield string, obj interface{}) (interface{}, string) {
 					}
 				}
 			}
-			if !valid {
-				continue
-			}
 
 		}
 

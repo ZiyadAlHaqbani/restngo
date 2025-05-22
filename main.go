@@ -10,7 +10,7 @@ func main() {
 
 	builder := builder.CreateNewBuilder()
 
-	builder.AddStaticNode("https://httpbin.org/json", models.GET, nil).
+	builder.AddStaticNode("https://openlibrary.org/search.json?q=test", models.GET, nil).
 		AddFindConstraint("[0]", models.TypeString)
 
 	print(builder.Run())
