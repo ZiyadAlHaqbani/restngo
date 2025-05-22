@@ -125,7 +125,7 @@ func matchMaps(a map[string]interface{}, b map[string]interface{}) (bool, string
 }
 
 func partialTraverse(subfield string, obj interface{}) (interface{}, string) {
-
+	//TODO: refactor to fix ugly code
 	traversals, _ := parseJSONPath(subfield)
 
 	temp_obj := obj
@@ -150,12 +150,9 @@ func partialTraverse(subfield string, obj interface{}) (interface{}, string) {
 			temp_obj = objects_queue.Dequeue()
 			if obj, err_message := _traverse(traversals, temp_obj); obj != nil {
 				return obj, err_message
-			} else {
-				unwrapped_obj, valid := obj.(map[string]interface{})
-				if !valid {
-					continue
-				}
+			}
 
+			if unwrapped_obj, valid := temp_obj.(map[string]interface{}); valid {
 				for _, value := range unwrapped_obj {
 					if v, valid := value.(map[string]interface{}); valid {
 						objects_queue.Enqueue(v)
@@ -163,8 +160,19 @@ func partialTraverse(subfield string, obj interface{}) (interface{}, string) {
 						objects_queue.Enqueue(v)
 					}
 				}
-
+			} else if unwrapped_array, valid := temp_obj.([]interface{}); valid {
+				for _, value := range unwrapped_array {
+					if v, valid := value.(map[string]interface{}); valid {
+						objects_queue.Enqueue(v)
+					} else if v, valid := value.([]interface{}); valid {
+						objects_queue.Enqueue(v)
+					}
+				}
 			}
+			if !valid {
+				continue
+			}
+
 		}
 
 		return nil, "TODO: error message when no partial field match found"

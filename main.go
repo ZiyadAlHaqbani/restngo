@@ -13,7 +13,7 @@ func main() {
 	builder.AddStaticNode("https://httpbin.org/json", models.GET, nil).
 		AddFindConstraint("[0]", models.TypeString)
 
-	builder.Run()
+	print(builder.Run())
 
 	fmt.Printf("END!")
 
