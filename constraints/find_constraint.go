@@ -24,11 +24,13 @@ func (constraint *Find_Constraint) Constrain(node models.Node) models.MatchStatu
 		}
 	}
 
-	return models.MatchStatus{
-		Failed:       false,
-		MatchedValue: obj,
-		ValueType:    constraint.Type,
+	status := checkType(obj, constraint.Type, constraint.Field)
+
+	if status.Failed {
+		status.Failed_at_node = &node
 	}
+
+	return status
 }
 
 func (constraint *Find_Constraint) ToString() string {

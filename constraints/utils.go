@@ -136,10 +136,12 @@ func partialTraverse(subfield string, obj interface{}) (interface{}, string) {
 		if !valid {
 			return nil, fmt.Sprintf("couldn't traverse object: %v as its not a JSON object", obj)
 		}
-		objects_queue := models.NewQueue[map[string]interface{}]()
+		objects_queue := models.NewQueue[interface{}]()
 
 		for _, value := range unwrapped_obj {
 			if v, valid := value.(map[string]interface{}); valid {
+				objects_queue.Enqueue(v)
+			} else if v, valid := value.([]interface{}); valid {
 				objects_queue.Enqueue(v)
 			}
 		}
@@ -156,6 +158,8 @@ func partialTraverse(subfield string, obj interface{}) (interface{}, string) {
 
 				for _, value := range unwrapped_obj {
 					if v, valid := value.(map[string]interface{}); valid {
+						objects_queue.Enqueue(v)
+					} else if v, valid := value.([]interface{}); valid {
 						objects_queue.Enqueue(v)
 					}
 				}

@@ -11,9 +11,10 @@ func main() {
 	builder := builder.CreateNewBuilder()
 
 	builder.AddStaticNode("https://httpbin.org/json", models.GET, nil).
-		AddFindConstraint("name", models.TypeString)
+		AddFindConstraint("[0]", models.TypeString)
 
 	builder.Run()
+
 	fmt.Printf("END!")
 
 	//program end
