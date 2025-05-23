@@ -11,9 +11,9 @@ func main() {
 	builder := builder.CreateNewBuilder()
 
 	builder.AddStaticNode("https://openlibrary.org/search.json?q=test", models.GET, nil).
-		AddFindConstraint("[0]", models.TypeString)
+		AddFindConstraint("name", models.TypeString)
 
-	print(builder.Run())
+	println(builder.Run())
 
 	fmt.Printf("END!")
 

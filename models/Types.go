@@ -3,6 +3,7 @@ package models
 type MatchType string
 
 const (
+	NOTYPE     MatchType = "NOTYPE"
 	TypeString MatchType = "string"
 	TypeFloat  MatchType = "float64"
 	TypeBool   MatchType = "bool"
