@@ -31,7 +31,7 @@ func TestTraverse(t *testing.T) {
 
 func TestPartialTraverse(t *testing.T) {
 
-	test_json, err := os.ReadFile("../dsl/cache/test_load.json")
+	test_json, err := os.ReadFile("../assets/test_load.json")
 	if err != nil {
 		assert.Error(t, err, "error reading test_load.json")
 	}

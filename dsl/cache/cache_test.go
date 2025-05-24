@@ -8,12 +8,12 @@ import (
 
 func TestFetchFileBytes(t *testing.T) {
 
-	test_load_contents, err := FetchFileBytes("test_load.json")
+	test_load_contents, err := FetchFileBytes("../../assets/test_load.json")
 	if err != nil {
 		t.Errorf("expected successful first read, got %+v", err)
 	}
 
-	test_load_cache, err := FetchFileBytes("test_load.json")
+	test_load_cache, err := FetchFileBytes("../../assets/test_load.json")
 	if err != nil {
 		t.Errorf("expected successful cache read, got %+v", err)
 	}
@@ -28,9 +28,9 @@ func TestUnloadFile(t *testing.T) {
 
 	TestFetchFileBytes(t)
 
-	UnloadFile("test_load.json")
+	UnloadFile("../../assets/test_load.json")
 
-	_, err := GetFileBytesRaw("test_load.json")
+	_, err := GetFileBytesRaw("../../assets/test_load.json")
 	if err == nil {
 		t.Error("expected err, got nil")
 	}
@@ -44,13 +44,13 @@ func TestSweepTTL(t *testing.T) {
 	_configs.Strategy = "TTL"
 
 	//load files for the first time and generate metadata
-	FetchFileBytes("test_load.json")
-	FetchFileBytes("cache_config.json")
+	FetchFileBytes("../../assets/test_load.json")
+	FetchFileBytes("../../assets/configs/cache_config.json")
 
 	time.Sleep(time.Millisecond * 10)
 
 	//activate sweep
-	FetchFileBytes("test_load.json")
+	FetchFileBytes("../../assets/test_load.json")
 
 	if len(cache) > 0 {
 		t.Errorf("expected empty cache, got cache of size: %+v", metadata)
