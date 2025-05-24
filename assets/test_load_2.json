@@ -1,0 +1,576 @@
+{
+    "platform": {
+        "name": "KnowledgeBase",
+        "version": "3.5.2",
+        "active": true,
+        "$meta": {
+            "lastUpdate": "2025-05-25T10:00:00Z",
+            "contributors": [
+                "alice",
+                "bob",
+                "陈"
+            ]
+        }
+    },
+    "settings": {
+        "theme": "light",
+        "notifications": {
+            "email": true,
+            "sms": false,
+            "push": {
+                "enabled": true,
+                "schedule": {
+                    "morning": [
+                        "08:00",
+                        "09:00"
+                    ],
+                    "evening": [
+                        "18:00"
+                    ]
+                },
+                "": "emptyKeyTrap"
+            }
+        },
+        "languages": [
+            "en",
+            "es",
+            "中文"
+        ]
+    },
+    "users": [
+        {
+            "userId": 101,
+            "name": "Alice",
+            "role": "instructor",
+            "profile": {
+                "bio": "Expert in JSON",
+                "social": {
+                    "twitter": "@alice",
+                    "linkedin": null
+                }
+            },
+            "coursesAssigned": [
+                201,
+                202
+            ]
+        },
+        {
+            "userId": 102,
+            "name": "Bob",
+            "role": "student",
+            "profile": null,
+            "coursesEnrolled": [
+                {
+                    "courseId": 201,
+                    "progress": 0.75,
+                    "completedModules": [
+                        301,
+                        302
+                    ],
+                    "quizzesTaken": [
+                        {
+                            "quizId": 401,
+                            "score": 85,
+                            "answers": [
+                                {
+                                    "question": "What is JSON?",
+                                    "answer": "Data format"
+                                },
+                                {
+                                    "question": "Deep trap",
+                                    "answer": null
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "platform": {
+                "name": "KnowledgeBase",
+                "version": "3.5.2",
+                "active": true,
+                "$meta": {
+                    "lastUpdate": "2025-05-25T10:00:00Z",
+                    "contributors": [
+                        "alice",
+                        "bob",
+                        "陈"
+                    ]
+                }
+            },
+            "settings": {
+                "theme": "light",
+                "notifications": {
+                    "email": true,
+                    "sms": false,
+                    "push": {
+                        "enabled": true,
+                        "schedule": {
+                            "morning": [
+                                "08:00",
+                                "09:00"
+                            ],
+                            "evening": [
+                                "18:00"
+                            ]
+                        },
+                        "": "emptyKeyTrap"
+                    }
+                },
+                "languages": [
+                    "en",
+                    "es",
+                    "中文"
+                ]
+            },
+            "users": [
+                {
+                    "userId": 101,
+                    "name": "Alice",
+                    "role": "instructor",
+                    "profile": {
+                        "bio": "Expert in JSON",
+                        "social": {
+                            "twitter": "@alice",
+                            "linkedin": null
+                        }
+                    },
+                    "coursesAssigned": [
+                        201,
+                        202
+                    ]
+                },
+                {
+                    "userId": 102,
+                    "name": "Bob",
+                    "role": "student",
+                    "profile": null,
+                    "coursesEnrolled": [
+                        {
+                            "courseId": 201,
+                            "progress": 0.75,
+                            "completedModules": [
+                                301,
+                                302
+                            ],
+                            "quizzesTaken": [
+                                {
+                                    "quizId": 401,
+                                    "score": 85,
+                                    "answers": [
+                                        {
+                                            "question": "What is JSON?",
+                                            "answer": "Data format"
+                                        },
+                                        {
+                                            "question": "Deep trap",
+                                            "answer": null
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "courses": [
+                {
+                    "courseId": 201,
+                    "title": "JSON Mastery",
+                    "description": "Master JSON schemas",
+                    "$version": "v1",
+                    "modules": [
+                        {
+                            "moduleId": 301,
+                            "title": "Basics",
+                            "lessons": [
+                                {
+                                    "lessonId": 501,
+                                    "title": "Introduction",
+                                    "content": [
+                                        "Definition of JSON",
+                                        {
+                                            "example": "{\"key\": \"value\"}"
+                                        },
+                                        [],
+                                        {}
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "instructors": {
+                "0": {
+                    "userId": 101,
+                    "experience": 5
+                },
+                "1": {
+                    "userId": 103,
+                    "experience": 10
+                }
+            },
+            "": "rootEmptyKey",
+            "alpha": {
+                "beta": "overrideBeta"
+            },
+            "mixed": [
+                1,
+                "two",
+                3.0,
+                false,
+                null,
+                [],
+                {},
+                [
+                    {}
+                ]
+            ]
+        }
+    ],
+    "courses": [
+        {
+            "courseId": 201,
+            "title": "JSON Mastery",
+            "description": "Master JSON schemas",
+            "$version": "v1",
+            "modules": [
+                {
+                    "moduleId": 301,
+                    "title": "Basics",
+                    "lessons": [
+                        {
+                            "lessonId": 501,
+                            "title": "Introduction",
+                            "content": [
+                                "Definition of JSON",
+                                {
+                                    "example": "{\"key\": \"value\"}"
+                                },
+                                [],
+                                {},
+                                {
+                                    "platform": {
+                                        "name": "KnowledgeBase",
+                                        "version": "3.5.2",
+                                        "active": true,
+                                        "$meta": {
+                                            "lastUpdate": "2025-05-25T10:00:00Z",
+                                            "contributors": [
+                                                "alice",
+                                                "bob",
+                                                "陈"
+                                            ]
+                                        }
+                                    },
+                                    "settings": {
+                                        "theme": "light",
+                                        "notifications": {
+                                            "email": true,
+                                            "sms": false,
+                                            "push": {
+                                                "enabled": true,
+                                                "schedule": {
+                                                    "morning": [
+                                                        "08:00",
+                                                        "09:00"
+                                                    ],
+                                                    "evening": [
+                                                        "18:00"
+                                                    ]
+                                                },
+                                                "": "emptyKeyTrap"
+                                            }
+                                        },
+                                        "languages": [
+                                            "en",
+                                            "es",
+                                            "中文"
+                                        ]
+                                    },
+                                    "users": [
+                                        {
+                                            "userId": 101,
+                                            "name": "Alice",
+                                            "role": "instructor",
+                                            "profile": {
+                                                "bio": "Expert in JSON",
+                                                "social": {
+                                                    "twitter": "@alice",
+                                                    "linkedin": null
+                                                }
+                                            },
+                                            "coursesAssigned": [
+                                                201,
+                                                202
+                                            ]
+                                        },
+                                        {
+                                            "userId": 102,
+                                            "name": "Bob",
+                                            "role": "student",
+                                            "profile": null,
+                                            "coursesEnrolled": [
+                                                {
+                                                    "courseId": 201,
+                                                    "progress": 0.75,
+                                                    "completedModules": [
+                                                        301,
+                                                        302
+                                                    ],
+                                                    "quizzesTaken": [
+                                                        {
+                                                            "quizId": 401,
+                                                            "score": 85,
+                                                            "answers": [
+                                                                {
+                                                                    "question": "What is JSON?",
+                                                                    "answer": "Data format"
+                                                                },
+                                                                {
+                                                                    "question": "Deep trap",
+                                                                    "answer": null
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "platform": {
+                                                "name": "KnowledgeBase",
+                                                "version": "3.5.2",
+                                                "active": true,
+                                                "$meta": {
+                                                    "lastUpdate": "2025-05-25T10:00:00Z",
+                                                    "contributors": [
+                                                        "alice",
+                                                        "bob",
+                                                        "陈"
+                                                    ]
+                                                }
+                                            },
+                                            "settings": {
+                                                "theme": "light",
+                                                "notifications": {
+                                                    "email": true,
+                                                    "sms": false,
+                                                    "push": {
+                                                        "enabled": true,
+                                                        "schedule": {
+                                                            "morning": [
+                                                                "08:00",
+                                                                "09:00"
+                                                            ],
+                                                            "evening": [
+                                                                "18:00"
+                                                            ]
+                                                        },
+                                                        "": "emptyKeyTrap"
+                                                    }
+                                                },
+                                                "languages": [
+                                                    "en",
+                                                    "es",
+                                                    "中文"
+                                                ]
+                                            },
+                                            "users": [
+                                                {
+                                                    "userId": 101,
+                                                    "name": "Alice",
+                                                    "role": "instructor",
+                                                    "profile": {
+                                                        "bio": "Expert in JSON",
+                                                        "social": {
+                                                            "twitter": "@alice",
+                                                            "linkedin": null
+                                                        }
+                                                    },
+                                                    "coursesAssigned": [
+                                                        201,
+                                                        202
+                                                    ]
+                                                },
+                                                {
+                                                    "userId": 102,
+                                                    "name": "Bob",
+                                                    "role": "student",
+                                                    "profile": null,
+                                                    "coursesEnrolled": [
+                                                        {
+                                                            "courseId": 201,
+                                                            "progress": 0.75,
+                                                            "completedModules": [
+                                                                301,
+                                                                302
+                                                            ],
+                                                            "quizzesTaken": [
+                                                                {
+                                                                    "quizId": 401,
+                                                                    "score": 85,
+                                                                    "answers": [
+                                                                        {
+                                                                            "question": "What is JSON?",
+                                                                            "answer": "Data format"
+                                                                        },
+                                                                        {
+                                                                            "question": "Deep trap",
+                                                                            "answer": null
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ],
+                                            "courses": [
+                                                {
+                                                    "courseId": 201,
+                                                    "title": "JSON Mastery",
+                                                    "description": "Master JSON schemas",
+                                                    "$version": "v1",
+                                                    "modules": [
+                                                        {
+                                                            "moduleId": 301,
+                                                            "title": "Basics",
+                                                            "lessons": [
+                                                                {
+                                                                    "lessonId": 501,
+                                                                    "title": "Introduction",
+                                                                    "content": [
+                                                                        "Definition of JSON",
+                                                                        {
+                                                                            "example": "{\"key\": \"value\"}"
+                                                                        },
+                                                                        [],
+                                                                        {}
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ],
+                                            "instructors": {
+                                                "0": {
+                                                    "userId": 101,
+                                                    "experience": 5
+                                                },
+                                                "1": {
+                                                    "userId": 103,
+                                                    "experience": 10
+                                                }
+                                            },
+                                            "": "rootEmptyKey",
+                                            "alpha": {
+                                                "beta": "overrideBeta"
+                                            },
+                                            "mixed": [
+                                                1,
+                                                "two",
+                                                3.0,
+                                                false,
+                                                null,
+                                                [],
+                                                {},
+                                                [
+                                                    {}
+                                                ]
+                                            ]
+                                        }
+                                    ],
+                                    "courses": [
+                                        {
+                                            "courseId": 201,
+                                            "title": "JSON Mastery",
+                                            "description": "Master JSON schemas",
+                                            "$version": "v1",
+                                            "modules": [
+                                                {
+                                                    "moduleId": 301,
+                                                    "title": "Basics",
+                                                    "lessons": [
+                                                        {
+                                                            "lessonId": 501,
+                                                            "title": "Introduction",
+                                                            "content": [
+                                                                "Definition of JSON",
+                                                                {
+                                                                    "example": "{\"key\": \"value\"}"
+                                                                },
+                                                                [],
+                                                                {}
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "instructors": {
+                                        "0": {
+                                            "userId": 101,
+                                            "experience": 5
+                                        },
+                                        "1": {
+                                            "userId": 103,
+                                            "experience": 10
+                                        }
+                                    },
+                                    "": "rootEmptyKey",
+                                    "alpha": {
+                                        "beta": "overrideBeta"
+                                    },
+                                    "mixed": [
+                                        1,
+                                        "two",
+                                        3.0,
+                                        false,
+                                        null,
+                                        [],
+                                        {},
+                                        [
+                                            {}
+                                        ]
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "instructors": {
+        "0": {
+            "userId": 101,
+            "experience": 5
+        },
+        "1": {
+            "userId": 103,
+            "experience": 10
+        }
+    },
+    "": "rootEmptyKey",
+    "alpha": {
+        "beta": "overrideBeta"
+    },
+    "mixed": [
+        1,
+        "two",
+        3.0,
+        false,
+        null,
+        [],
+        {},
+        [
+            {}
+        ]
+    ]
+}
