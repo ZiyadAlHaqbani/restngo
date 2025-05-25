@@ -15,6 +15,8 @@ func main() {
 
 	println(builder.Run())
 
+	builder.PrintList()
+
 	fmt.Printf("END!")
 
 	//program end

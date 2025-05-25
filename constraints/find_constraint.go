@@ -34,5 +34,5 @@ func (constraint *Find_Constraint) Constrain(node models.Node) models.MatchStatu
 }
 
 func (constraint *Find_Constraint) ToString() string {
-	panic("implement constraints.Find_Constraint.ToString()")
+	return "fnd_" + constraint.Status.ToString()
 }

@@ -388,6 +388,18 @@ func (builder *TestBuilder) AddFindConstraint(field string, expectedType models.
 	return builder
 }
 
+func (builder *TestBuilder) AddFindStoreConstraint(field string, expectedType models.MatchType, varname string) *TestBuilder {
+	constraint := constraints.Find_Store_Constraint{
+		InnerConstraint: constraints.Find_Constraint{
+			Field: field,
+			Type:  expectedType,
+		},
+		Varname: varname,
+	}
+	builder.current.AddConstraint(&constraint)
+	return builder
+}
+
 func (builder *TestBuilder) AddMatchConstraint(field string, expectedValue interface{}, expectedType models.MatchType) *TestBuilder {
 	constraint := constraints.Match_Constraint{
 		Field:    field,
