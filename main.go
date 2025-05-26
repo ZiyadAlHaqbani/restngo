@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"htestp/builder"
 	"htestp/models"
@@ -25,12 +24,12 @@ func main() {
 
 	builder.PrintList()
 
-	json, err := json.MarshalIndent(builder, "", " ")
-	if err != nil {
-		println(err)
-	}
+	// json, err := json.MarshalIndent(builder, "", " ")
+	// if err != nil {
+	// 	println(err)
+	// }
 
-	fmt.Printf("%s", json)
+	// fmt.Printf("%s", json)
 
 	fmt.Printf("END!")
 
