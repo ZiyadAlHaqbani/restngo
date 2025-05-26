@@ -24,7 +24,7 @@ func (match *MatchStatus) ToString() string {
 	if !match.Failed {
 		temp := ""
 		if match.MatchedValue != nil {
-			temp += fmt.Sprintf("found Value '%+v, %T' with expected type '%s'", match.MatchedValue, match.MatchedValue, match.ValueType)
+			temp += fmt.Sprintf("found Value '%+v' with expected type '%s'", match.MatchedValue, match.ValueType)
 		}
 		return temp
 	}

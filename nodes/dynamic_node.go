@@ -14,8 +14,8 @@ import (
 type DynamicNode struct {
 	InnerNode StaticNode
 	// TODO: Use url values instead of map[string]string
-	QueryBuilderFunc func(storage *map[string]models.TypedVariable) url.Values
-	BodyBuilderFunc  func(storage *map[string]models.TypedVariable) map[string]interface{}
+	QueryBuilderFunc func(storage *map[string]models.TypedVariable) url.Values             `json:"-"`
+	BodyBuilderFunc  func(storage *map[string]models.TypedVariable) map[string]interface{} `json:"-"`
 	Next             []models.Node
 }
 
@@ -93,7 +93,6 @@ func (node *DynamicNode) Successful() bool {
 	return node.InnerNode.Successful()
 }
 
-
 func (node *DynamicNode) GetConstraints() []models.Constraint {
 	return node.InnerNode.Constraints
 }
@@ -130,4 +129,3 @@ func (node *DynamicNode) SetNextNodes(next []models.Node) {
 func (node *DynamicNode) GetID() string {
 	return node.InnerNode.GetID()
 }
-
