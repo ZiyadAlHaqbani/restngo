@@ -14,8 +14,6 @@ type StaticNode struct {
 	Response    httphandler.HTTPResponse
 	Constraints []models.Constraint
 	Failed      bool
-
-	INTERNAL bool // flag to define whether or not the current node is only used as an internal node for a wrapper node type
 }
 
 func (node *StaticNode) Execute(client *http.Client) (httphandler.HTTPResponse, error) {
@@ -54,10 +52,7 @@ func (node *StaticNode) AddNode(new models.Node) {
 
 func (node *StaticNode) ToString() string {
 
-	var temp string
-	if !node.INTERNAL {
-		temp = "Static Node: "
-	}
+	temp := "Static Node "
 	temp = fmt.Sprintf("%s(ID: %s), %s_%s", temp, node.ID, node.Request.Method, node.Request.Url)
 
 	if len(node.Constraints) > 0 {

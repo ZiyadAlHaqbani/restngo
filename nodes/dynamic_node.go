@@ -83,8 +83,16 @@ func (node *DynamicNode) AddNode(new models.Node) {
 }
 
 func (node *DynamicNode) ToString() string {
-	temp := "Dynamic Node: "
-	temp = fmt.Sprintf("%s%s", temp, node.InnerNode.ToString())
+	temp := "Dynamic Node "
+	temp = fmt.Sprintf("%s(ID: %s), %s_%s", temp, node.InnerNode.ID, node.InnerNode.Request.Method, node.InnerNode.Request.Url)
+
+	if len(node.InnerNode.Constraints) > 0 {
+		temp += " {"
+		for _, constr := range node.InnerNode.Constraints {
+			temp += constr.ToString() + ", "
+		}
+		temp += "}"
+	}
 	return temp
 }
 
@@ -116,15 +124,6 @@ func (node *DynamicNode) GetNextNodes() []models.Node {
 func (node *DynamicNode) SetNextNodes(next []models.Node) {
 	node.Next = next
 }
-
-// GetConstraints() []Constraint
-// SetConstraints([]Constraint)
-
-// GetRequest() httphandler.Request
-// SetRequest(httphandler.Request)
-
-// GetNextNodes() []Node
-// SetNextNodes([]Node)
 
 func (node *DynamicNode) GetID() string {
 	return node.InnerNode.GetID()

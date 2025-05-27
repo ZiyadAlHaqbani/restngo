@@ -115,8 +115,7 @@ func (builder *TestBuilder) AddDynamicNodeId(id string, url string, method model
 				Url:    url,
 				Method: string(method),
 			},
-			ID:       id,
-			INTERNAL: true,
+			ID: id,
 		},
 		QueryBuilderFunc: queryBuilder,
 		BodyBuilderFunc:  bodyBuilder,
@@ -140,7 +139,7 @@ func (builder *TestBuilder) AddDynamicNodeRawId(id string, request httphandler.R
 	}
 
 	new := &nodes.DynamicNode{
-		InnerNode:        nodes.StaticNode{Request: request, ID: id, INTERNAL: true},
+		InnerNode:        nodes.StaticNode{Request: request, ID: id},
 		QueryBuilderFunc: queryBuilder,
 		BodyBuilderFunc:  bodyBuilder,
 	}
@@ -193,8 +192,7 @@ func (builder *TestBuilder) AddChildDynamicNode(newID string, parentID string, u
 				Url:    url,
 				Method: string(method),
 			},
-			ID:       newID,
-			INTERNAL: true,
+			ID: newID,
 		},
 		QueryBuilderFunc: queryBuilder,
 		BodyBuilderFunc:  bodyBuilder,
@@ -234,7 +232,7 @@ func (builder *TestBuilder) AddChildDynamicNodeRaw(newID string, parentID string
 	}
 
 	new := &nodes.DynamicNode{
-		InnerNode:        nodes.StaticNode{Request: request, ID: newID, INTERNAL: true},
+		InnerNode:        nodes.StaticNode{Request: request, ID: newID},
 		QueryBuilderFunc: queryBuilder,
 		BodyBuilderFunc:  bodyBuilder,
 	}
@@ -366,8 +364,7 @@ func (builder *TestBuilder) AddDynamicNodeBranch(url string, method models.HTTPM
 	}
 	new := &nodes.DynamicNode{
 		InnerNode: nodes.StaticNode{
-			Request:  request,
-			INTERNAL: true,
+			Request: request,
 		},
 		QueryBuilderFunc: queryBuilder,
 		BodyBuilderFunc:  bodyBuilder,
