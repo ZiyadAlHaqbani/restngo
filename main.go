@@ -22,6 +22,8 @@ func main() {
 				return params
 			}, nil)
 
+	builder.Run()
+
 	builder.PrintList()
 
 	// json, err := json.MarshalIndent(builder, "", " ")

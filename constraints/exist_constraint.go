@@ -41,5 +41,5 @@ func (exist *Exist_Constraint) constrain(node models.Node) models.MatchStatus {
 
 func (match *Exist_Constraint) ToString() string {
 
-	return "exst_cnstr_" + match.Status.ToString()
+	return "exst_cnstr " + match.Status.ToString()
 }

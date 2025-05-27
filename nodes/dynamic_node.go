@@ -86,7 +86,11 @@ func (node *DynamicNode) ToString() string {
 	temp := "Dynamic Node "
 	temp = fmt.Sprintf("%s(ID: %s), %s_%s", temp, node.InnerNode.ID, node.InnerNode.Request.Method, node.InnerNode.Request.Url)
 
-	if len(node.InnerNode.Constraints) > 0 {
+	if len(node.InnerNode.Constraints) == 1 {
+		temp += "{"
+		temp += node.InnerNode.Constraints[0].ToString()
+		temp += "}"
+	} else if len(node.InnerNode.Constraints) > 1 {
 		temp += " {"
 		for _, constr := range node.InnerNode.Constraints {
 			temp += constr.ToString() + ", "
