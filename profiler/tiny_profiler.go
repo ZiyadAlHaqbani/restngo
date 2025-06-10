@@ -42,7 +42,7 @@ func ProfileScope(id string) func() {
 	}
 }
 
-func DumpScopesToChromeTrace(filename string, scopes []Scope) error {
+func dumpScopesToChromeTrace(filename string, scopes []Scope) error {
 	events := []ChromeTraceEvent{}
 
 	for _, scope := range scopes {
@@ -73,7 +73,7 @@ func DumpScopesToChromeTrace(filename string, scopes []Scope) error {
 
 func DumpTrace(filename string) {
 
-	err := DumpScopesToChromeTrace(filename, Scopes)
+	err := dumpScopesToChromeTrace(filename, Scopes)
 	if err != nil {
 		log.Panicf("ERROR: %+v", err)
 	}
