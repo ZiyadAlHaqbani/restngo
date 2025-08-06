@@ -51,17 +51,22 @@ func (node *StaticNode) AddNode(new models.Node) {
 }
 
 func (node *StaticNode) ToString() string {
-	temp := fmt.Sprintf("ID: %s, %s_%s", node.ID, node.Request.Method, node.Request.Url)
 
-	if len(node.Constraints) > 0 {
+	temp := "Static Node "
+	temp = fmt.Sprintf("%s(ID: %s), METHOD:%s URL:%s", temp, node.ID, node.Request.Method, node.Request.Url)
+
+	if len(node.Constraints) == 1 {
+		temp += "{"
+		temp += node.Constraints[0].ToString()
+		temp += "}"
+	} else if len(node.Constraints) > 1 {
 		temp += " {"
-		for _, constr := range node.Constraints {
-			temp += constr.ToString() + ", "
+		temp += node.Constraints[0].ToString()
+		for _, constr := range node.Constraints[1:] {
+			temp += ", " + constr.ToString()
 		}
 		temp += "}"
 	}
-	// resp := node.GetResp()
-	// temp = fmt.Sprintf("%s\n%s", temp, resp.ToString())
 
 	return temp
 }
@@ -69,7 +74,6 @@ func (node *StaticNode) ToString() string {
 func (node *StaticNode) Successful() bool {
 	return !node.Failed
 }
-
 
 func (node *StaticNode) GetConstraints() []models.Constraint {
 	return node.Constraints
@@ -94,7 +98,7 @@ func (node *StaticNode) GetNextNodes() []models.Node {
 func (node *StaticNode) SetNextNodes(next []models.Node) {
 	node.Next = next
 }
-  
+
 func (node *StaticNode) GetID() string {
 	return node.ID
 }

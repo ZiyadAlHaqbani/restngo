@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-// constrain nodes, where at the end of each step, the response must satisfy all related constraints
+// constrain nodes, where at the end of each step, the response must satisfy all/some related constraints based on the runner configs.
 type Constraint interface {
 	Constrain(node Node) MatchStatus
 	ToString() string
@@ -24,7 +24,17 @@ func (match *MatchStatus) ToString() string {
 	if !match.Failed {
 		temp := ""
 		if match.MatchedValue != nil {
-			temp += fmt.Sprintf("found Value '%+v, %T' with expected type '%s'", match.MatchedValue, match.MatchedValue, match.ValueType)
+
+			// restrict the size of the matched value string to reduce clutter
+			matchedValue_str := fmt.Sprintf("%v", match.MatchedValue)
+			if len(matchedValue_str) >= 100 {
+				matchedValue_str = fmt.Sprintf("%.100s", matchedValue_str)
+				matchedValue_str += "..."
+			}
+
+			temp += fmt.Sprintf("found Value '%s' with expected type '%s'", matchedValue_str, match.ValueType)
+		} else {
+			temp += match.Message
 		}
 		return temp
 	}

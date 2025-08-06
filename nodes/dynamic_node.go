@@ -14,8 +14,8 @@ import (
 type DynamicNode struct {
 	InnerNode StaticNode
 	// TODO: Use url values instead of map[string]string
-	QueryBuilderFunc func(storage *map[string]models.TypedVariable) url.Values
-	BodyBuilderFunc  func(storage *map[string]models.TypedVariable) map[string]interface{}
+	QueryBuilderFunc func(storage *map[string]models.TypedVariable) url.Values             `json:"-"`
+	BodyBuilderFunc  func(storage *map[string]models.TypedVariable) map[string]interface{} `json:"-"`
 	Next             []models.Node
 }
 
@@ -83,8 +83,20 @@ func (node *DynamicNode) AddNode(new models.Node) {
 }
 
 func (node *DynamicNode) ToString() string {
-	temp := "Dynamic Node: "
-	temp = fmt.Sprintf("%s%s", temp, node.InnerNode.ToString())
+	temp := "Dynamic Node "
+	temp = fmt.Sprintf("%s(ID: %s), %s_%s", temp, node.InnerNode.ID, node.InnerNode.Request.Method, node.InnerNode.Request.Url)
+
+	if len(node.InnerNode.Constraints) == 1 {
+		temp += "{"
+		temp += node.InnerNode.Constraints[0].ToString()
+		temp += "}"
+	} else if len(node.InnerNode.Constraints) > 1 {
+		temp += " {"
+		for _, constr := range node.InnerNode.Constraints {
+			temp += constr.ToString() + ", "
+		}
+		temp += "}"
+	}
 	return temp
 }
 
@@ -92,7 +104,6 @@ func (node *DynamicNode) Successful() bool {
 	// Returns the opposite of flag failed
 	return node.InnerNode.Successful()
 }
-
 
 func (node *DynamicNode) GetConstraints() []models.Constraint {
 	return node.InnerNode.Constraints
@@ -118,16 +129,6 @@ func (node *DynamicNode) SetNextNodes(next []models.Node) {
 	node.Next = next
 }
 
-// GetConstraints() []Constraint
-// SetConstraints([]Constraint)
-
-// GetRequest() httphandler.Request
-// SetRequest(httphandler.Request)
-
-// GetNextNodes() []Node
-// SetNextNodes([]Node)
-
 func (node *DynamicNode) GetID() string {
 	return node.InnerNode.GetID()
 }
-

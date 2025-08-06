@@ -22,11 +22,10 @@ func main() {
 				return params
 			}, nil)
 
-	println(builder.Run())
+	builder.Run()
 
 	builder.PrintList()
 
 	fmt.Printf("END!")
 
-	//program end
 }
