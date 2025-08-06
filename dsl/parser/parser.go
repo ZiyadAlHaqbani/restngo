@@ -188,6 +188,7 @@ func (parser *Parser) parseConstraint() models.Constraint {
 			Varname: varname.Content,
 		}
 	case "MatchConstraint":
+		parser.consume(scanner.Comma)
 		temp := constraints.Match_Constraint{
 			Field:    field.Content,
 			Type:     expected,
