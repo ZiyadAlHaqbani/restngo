@@ -170,8 +170,16 @@ func (scanner *Scanner) number() {
 		scanner.advance()
 	}
 
-	if !isWhiteSpace(scanner.peek()) && scanner.peek() != ',' {
-		log.Panicf("ERROR: numbers must only end with whitespace or comma ',', at: %+v", scanner.addToken(Number))
+	// in case of floating number
+	if scanner.peek() == '.' {
+		scanner.advance()
+		for isDigit(scanner.peek()) {
+			scanner.advance()
+		}
+	}
+
+	if !isWhiteSpace(scanner.peek()) && scanner.peek() != ',' && scanner.peek() != ')' {
+		log.Panicf("ERROR: numbers must only end with whitespace, comma ',' or right paren ')', at: %+v", scanner.addToken(Number))
 	}
 
 	scanner.addToken(Number)

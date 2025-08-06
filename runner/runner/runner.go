@@ -37,3 +37,27 @@ func RunHelper(client *http.Client, node models.Node) bool {
 
 	return success
 }
+
+func GetBranches(head models.Node) []models.Node {
+	list_of_branches := []models.Node{}
+	list_of_branches = append(list_of_branches, head)
+	getBranchesHelper(head, list_of_branches)
+	return list_of_branches
+}
+
+func getBranchesHelper(node models.Node, list []models.Node) {
+
+	if len(node.GetNextNodes()) == 0 {
+		return
+	}
+
+	if len(node.GetNextNodes()) == 1 {
+		getBranchesHelper(node.GetNextNodes()[0], list)
+	} else {
+		for _, next := range node.GetNextNodes() {
+			list = append(list, next)
+			getBranchesHelper(next, list)
+		}
+	}
+
+}

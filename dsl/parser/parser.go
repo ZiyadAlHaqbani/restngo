@@ -188,7 +188,6 @@ func (parser *Parser) parseConstraint() models.Constraint {
 			Varname: varname.Content,
 		}
 	case "MatchConstraint":
-		log.Panicf("MatchStoreConstraint is not supported yet")
 		temp := constraints.Match_Constraint{
 			Field:    field.Content,
 			Type:     expected,
