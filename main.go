@@ -12,7 +12,7 @@ func main() {
 	builder := builder.CreateNewBuilder()
 
 	builder.AddStaticNode("https://openlibrary.org/search.json?q=test", models.GET, nil).
-		AddExistStoreConstraint("", models.TypeObject, "test_var").
+		AddFindStoreConstraint("title", models.TypeString, "test_var").
 		AddDynamicNode("https://openlibrary.org/search.json", models.GET,
 			func(ctx *map[string]models.TypedVariable) url.Values {
 				params := url.Values{}

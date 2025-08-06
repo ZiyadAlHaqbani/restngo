@@ -33,7 +33,7 @@ func (d *Duration) UnmarshalJSON(b []byte) error {
 }
 
 // can be overridden by the build options
-var configPath string = "cache_config.json"
+var configPath string = "../../assets/configs/cache_config.json"
 
 var _configs struct {
 	TTL               Duration
