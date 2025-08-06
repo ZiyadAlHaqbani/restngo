@@ -5,6 +5,7 @@ import (
 	"htestp/dsl/parser"
 	"htestp/dsl/scanner"
 	"htestp/runner/runner"
+	"net/http"
 	"os"
 )
 
@@ -20,6 +21,8 @@ func main() {
 
 	parser := parser.CreateParser(scanner.Scan())
 	parser.Parse()
+
+	runner.RunHelper(http.DefaultClient, parser.Head)
 
 	fmt.Printf("%+v\n", runner.GetBranches(parser.Head))
 

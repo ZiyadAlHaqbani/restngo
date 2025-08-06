@@ -51,13 +51,12 @@ func getBranchesHelper(node models.Node, list []models.Node) {
 		return
 	}
 
-	if len(node.GetNextNodes()) == 1 {
-		getBranchesHelper(node.GetNextNodes()[0], list)
-	} else {
-		for _, next := range node.GetNextNodes() {
-			list = append(list, next)
-			getBranchesHelper(next, list)
-		}
+	if len(node.GetNextNodes()) > 1 {
+		list = append(list, node)
+	}
+
+	for _, child := range node.GetNextNodes() {
+		getBranchesHelper(child, list)
 	}
 
 }
