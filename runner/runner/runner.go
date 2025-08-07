@@ -60,3 +60,38 @@ func getBranchesHelper(node models.Node, list []models.Node) {
 	}
 
 }
+
+func GetBranches_(head models.Node) []models.Segment {
+	list_of_segments := []models.Segment{}
+	getBranchesHelper_(head, head, &list_of_segments)
+	return list_of_segments
+}
+
+// pass a list pointer instead of a value to fix issues with mutation
+func getBranchesHelper_(node models.Node, previous_branch models.Node, list *[]models.Segment) {
+
+	// if this is a leaf node, create a new segment
+	if len(node.GetNextNodes()) == 0 {
+		*list = append(*list, models.Segment{
+			Start: previous_branch,
+			End:   node,
+		})
+		return
+	}
+
+	new_branch := previous_branch
+
+	// if this is a branching node, create a new segment
+	if len(node.GetNextNodes()) > 1 {
+		*list = append(*list, models.Segment{
+			Start: previous_branch,
+			End:   node,
+		})
+		new_branch = node
+	}
+
+	for _, child := range node.GetNextNodes() {
+		getBranchesHelper_(child, new_branch, list)
+	}
+
+}

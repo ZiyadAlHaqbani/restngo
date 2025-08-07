@@ -125,6 +125,9 @@ func (parser *Parser) parseStaticNode() models.Node {
 
 	staticNode.Constraints = constraints
 
+	//TODO: remove later
+	staticNode.ID = id.Content
+
 	children := []models.Node{}
 	for parser.check(scanner.Node) {
 		new := parser.parseNode()
